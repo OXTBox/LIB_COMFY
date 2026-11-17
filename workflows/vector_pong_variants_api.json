@@ -1,0 +1,165 @@
+{
+ "1": {
+  "class_type": "VC3D_GameStart",
+  "inputs": {
+   "title": "Comfy Pong",
+   "name": "ComfyPong",
+   "seed": 1,
+   "dice": 1.0
+  }
+ },
+ "2": {
+  "class_type": "VC3D_Palette",
+  "inputs": {
+   "hue": 190,
+   "scheme": "random",
+   "dice": 0.5,
+   "game": [
+    "1",
+    0
+   ]
+  }
+ },
+ "3": {
+  "class_type": "VC3D_Court",
+  "inputs": {
+   "width": 760,
+   "height": 420,
+   "style": "random",
+   "grid": 60,
+   "wall_color": "auto",
+   "goal_color": "auto",
+   "dice": 0.5,
+   "game": [
+    "2",
+    0
+   ]
+  }
+ },
+ "4": {
+  "class_type": "VC3D_Paddle",
+  "inputs": {
+   "side": "L",
+   "control": "arrows",
+   "team": "auto",
+   "length": 90,
+   "speed": 9.0,
+   "inset": 24,
+   "skill": 0.6,
+   "color": "auto",
+   "appear": 1.0,
+   "dice": 0.5,
+   "game": [
+    "3",
+    0
+   ]
+  }
+ },
+ "5": {
+  "class_type": "VC3D_Paddle",
+  "inputs": {
+   "side": "R",
+   "control": "cpu",
+   "team": "auto",
+   "length": 90,
+   "speed": 8.0,
+   "inset": 24,
+   "skill": 0.6,
+   "color": "auto",
+   "appear": 1.0,
+   "dice": 0.5,
+   "game": [
+    "4",
+    0
+   ]
+  }
+ },
+ "6": {
+  "class_type": "VC3D_Paddle",
+  "inputs": {
+   "side": "T",
+   "control": "cpu",
+   "team": "auto",
+   "length": 120,
+   "speed": 8.0,
+   "inset": 24,
+   "skill": 0.6,
+   "color": "auto",
+   "appear": 0.5,
+   "dice": 0.5,
+   "game": [
+    "5",
+    0
+   ]
+  }
+ },
+ "7": {
+  "class_type": "VC3D_Paddle",
+  "inputs": {
+   "side": "R",
+   "control": "cpu",
+   "team": "auto",
+   "length": 60,
+   "speed": 8.0,
+   "inset": 220,
+   "skill": 0.5,
+   "color": "auto",
+   "appear": 0.4,
+   "dice": 0.5,
+   "game": [
+    "6",
+    0
+   ]
+  }
+ },
+ "8": {
+  "class_type": "VC3D_Ball",
+  "inputs": {
+   "size": 14,
+   "speed": 7.0,
+   "speed_up": 1.05,
+   "top_speed": 16.0,
+   "count": 1,
+   "shape": "random",
+   "color": "auto",
+   "dice": 0.5,
+   "game": [
+    "7",
+    0
+   ]
+  }
+ },
+ "9": {
+  "class_type": "VC3D_MatchRules",
+  "inputs": {
+   "points_to_win": 5,
+   "levels": 3,
+   "level_speed_up": 0.15,
+   "dice": 0.5,
+   "game": [
+    "8",
+    0
+   ]
+  }
+ },
+ "10": {
+  "class_type": "VC3D_BuildGame",
+  "inputs": {
+   "add_seed_to_name": true,
+   "save_to": "LIB_GAMES (the game launcher sees it)",
+   "game": [
+    "9",
+    0
+   ]
+  }
+ },
+ "11": {
+  "class_type": "PreviewImage",
+  "inputs": {
+   "images": [
+    "10",
+    1
+   ]
+  }
+ }
+}
