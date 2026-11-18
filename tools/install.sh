@@ -9,6 +9,8 @@ for INST in "$BASE"/${1:-*}/; do
   DST="$INST/ComfyUI/custom_nodes/ComfyUI-Vibecode3D"
   mkdir -p "$DST"
   cp "$SRC"/*.py "$DST"/
-  rm -rf "$DST/__pycache__"
+  mkdir -p "$DST/kits"
+  cp "$SRC"/kits/*.py "$DST/kits/"
+  rm -rf "$DST/__pycache__" "$DST/kits/__pycache__"
   echo "installed to $(basename "$INST")"
 done
