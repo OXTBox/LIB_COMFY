@@ -63,13 +63,37 @@ def wave_small(seed):
     return g
 
 
+def coil(seed, target=10):
+    g = start("Comfy Worm", "ComfyWorm", seed)
+    g = run("VC3D_WormBoard", g, columns=28, rows=16, cell=22, edges="random", blocks=6, block_style="random",
+            floor="random", wall_color="auto", block_color="auto", dice=0.5)
+    g = run("VC3D_Worm", g, control="arrows", length=4, step_frames=5, speed_up=0.1, fastest=2, head="tri",
+            color="auto", dice=0.5)
+    g = run("VC3D_Food", g, kind="plain", count=2, points=10, grow=1, life=0, shape="ring", color="auto",
+            appear=1.0, dice=0.3)
+    g = run("VC3D_Food", g, kind="gold", count=1, points=50, grow=3, life=240, shape="star", color="auto",
+            appear=0.8, dice=0.3)
+    g = run("VC3D_Food", g, kind="random", count=1, points=20, grow=1, life=0, shape="random", color="auto",
+            appear=0.6, dice=0.5)
+    g = run("VC3D_WormRules", g, lives=3, levels=3, food_to_eat=target, more_each_level=5, blocks_each_level=4,
+            faster_each_level=1, dice=0.5)
+    return g
+
+
+def coil_small(seed):
+    g = coil(seed, target=3)
+    g["name"] = "ComfyWormSmall"
+    return g
+
+
 def brick_small(seed):
     g = brick(seed, rows=2)
     g["name"] = "ComfyBricksSmall"
     return g
 
 
-CHAINS = {"brick": brick, "brick_small": brick_small, "wave": wave, "wave_small": wave_small}
+CHAINS = {"brick": brick, "brick_small": brick_small, "wave": wave, "wave_small": wave_small,
+          "coil": coil, "coil_small": coil_small}
 for extra in ("wave", "coil", "dodge"):
     f = globals().get("chain_" + extra)
     if f:

@@ -266,7 +266,7 @@ class BuildGame:
 # Every kit but Pong: a node is made from (key, display name, category, description, inputs, run).
 # Inputs are (name, ComfyUI spec) in widget order; run(game, **widgets) returns the new game.
 from . import kits  # noqa: E402
-from .kits import brick, wave  # noqa: E402,F401
+from .kits import brick, wave, coil  # noqa: E402,F401
 
 CAT_SHARED = "Vibecode3D/Shared"
 
@@ -380,6 +380,39 @@ _node("VC3D_WaveRules", "Wave Rules (Vibecode3D)", CAT_WAVE,
       [("ships", _int(3, 1, 9)), ("waves_to_win", _int(0, 0, 30)), ("round_speed_up", _float(0.25, 0.0, 1.0)),
        ("rush", _float(1.5, 0.0, 4.0, 0.1, "speed added as the wave thins out")), ("dice", _dice())],
       lambda game, **k: wave.rules(game, **k))
+
+# -------- Grid Worm
+CAT_COIL = "Vibecode3D/Grid Worm"
+_node("VC3D_WormBoard", "Worm Board (Vibecode3D)", CAT_COIL,
+      "The board: columns, rows, cell size, solid or wrapping edges, blocks in the way.",
+      [("columns", _int(28, 8, 48)), ("rows", _int(16, 6, 30)), ("cell", _int(22, 10, 32)),
+       ("edges", _pick(coil.EDGES + ("random",), "walls")),
+       ("blocks", _int(6, 0, 40, 1, "blocks on level 1")), ("block_style", _pick(coil.BLOCKS + ("random",), "scatter")),
+       ("floor", _pick(("grid", "dots", "bare", "random"), "dots")),
+       ("wall_color", _color()), ("block_color", _color()), ("dice", _dice())],
+      lambda game, **k: coil.board(game, **k))
+_node("VC3D_Worm", "Worm (Vibecode3D)", CAT_COIL,
+      "The worm: keys, starting length, how many steps between moves (more = slower), how it speeds up.",
+      [("control", _pick(("arrows", "wasd"), "arrows")), ("length", _int(4, 2, 20)),
+       ("step_frames", _int(6, 2, 20, 1, "steps between moves: bigger is slower")),
+       ("speed_up", _float(0.1, 0.0, 1.0, 0.05, "steps taken off after each food")),
+       ("fastest", _int(2, 1, 10, 1, "the fewest steps between moves")),
+       ("head", _pick(coil.HEADS + ("random",), "tri")), ("color", _color()), ("dice", _dice())],
+      lambda game, **k: coil.worm(game, **k))
+_node("VC3D_Food", "Food (Vibecode3D)", CAT_COIL,
+      "One kind of food. Chain several: plain grows you, gold is worth more and moves if you are slow, shrink takes two off, slow eases the pace.",
+      [("kind", _pick(coil.FOODS + ("random",), "plain")), ("count", _int(1, 1, 6, 1, "on the board at once")),
+       ("points", _int(10, 1, 200)), ("grow", _int(1, 0, 6, 1, "cells added")),
+       ("life", _int(240, 0, 900, 10, "gold only: steps before it moves")),
+       ("shape", _pick(coil.FOOD_SHAPES + ("random",), "ring")), ("color", _color()),
+       ("appear", _chance()), ("dice", _dice())],
+      lambda game, **k: coil.food(game, **k))
+_node("VC3D_WormRules", "Worm Rules (Vibecode3D)", CAT_COIL,
+      "Lives, levels, food to eat for a level, and what each level adds.",
+      [("lives", _int(3, 1, 9)), ("levels", _int(3, 1, 9)), ("food_to_eat", _int(10, 1, 60)),
+       ("more_each_level", _int(5, 0, 20)), ("blocks_each_level", _int(4, 0, 20)),
+       ("faster_each_level", _int(1, 0, 4, 1, "steps taken off the pace each level")), ("dice", _dice())],
+      lambda game, **k: coil.rules(game, **k))
 
 NODE_CLASS_MAPPINGS = {
     "VC3D_GameStart": GameStart,
