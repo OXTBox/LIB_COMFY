@@ -86,6 +86,26 @@ def coil_small(seed):
     return g
 
 
+def dodge(seed, distance=1200, lanes=5):
+    g = start("Comfy Dodge", "ComfyDodge", seed)
+    g = run("VC3D_Arena", g, width=600, height=440, floor="lanes", spacing=60, wall_color="auto", dice=0.3)
+    g = run("VC3D_Runner", g, control="arrows", lanes=lanes, shape="ship", size=28, speed=9.0, color="auto", dice=0.5)
+    g = run("VC3D_Hazard", g, shape="rock", size=36, speed=5.0, rate=0.03, wobble=0, in_lane=True, spin=True,
+            points=5, color="auto", appear=1.0, dice=0.5)
+    g = run("VC3D_Hazard", g, shape="random", size=24, speed=7.0, rate=0.015, wobble=40, in_lane=False, spin=False,
+            points=10, color="auto", appear=0.8, dice=0.5)
+    g = run("VC3D_Pickup", g, kind="coin", rate=0.008, points=25, color="auto", appear=1.0, dice=0.3)
+    g = run("VC3D_Pickup", g, kind="random", rate=0.003, points=10, color="auto", appear=0.7, dice=0.3)
+    g = run("VC3D_DodgeRules", g, lives=3, levels=3, distance=distance, level_speed_up=0.25, scroll=6.0, dice=0.5)
+    return g
+
+
+def dodge_small(seed):
+    g = dodge(seed, distance=200, lanes=0)
+    g["name"] = "ComfyDodgeSmall"
+    return g
+
+
 def brick_small(seed):
     g = brick(seed, rows=2)
     g["name"] = "ComfyBricksSmall"
@@ -93,7 +113,7 @@ def brick_small(seed):
 
 
 CHAINS = {"brick": brick, "brick_small": brick_small, "wave": wave, "wave_small": wave_small,
-          "coil": coil, "coil_small": coil_small}
+          "coil": coil, "coil_small": coil_small, "dodge": dodge, "dodge_small": dodge_small}
 for extra in ("wave", "coil", "dodge"):
     f = globals().get("chain_" + extra)
     if f:

@@ -266,7 +266,7 @@ class BuildGame:
 # Every kit but Pong: a node is made from (key, display name, category, description, inputs, run).
 # Inputs are (name, ComfyUI spec) in widget order; run(game, **widgets) returns the new game.
 from . import kits  # noqa: E402
-from .kits import brick, wave, coil  # noqa: E402,F401
+from .kits import brick, wave, coil, dodge  # noqa: E402,F401
 
 CAT_SHARED = "Vibecode3D/Shared"
 
@@ -413,6 +413,37 @@ _node("VC3D_WormRules", "Worm Rules (Vibecode3D)", CAT_COIL,
        ("more_each_level", _int(5, 0, 20)), ("blocks_each_level", _int(4, 0, 20)),
        ("faster_each_level", _int(1, 0, 4, 1, "steps taken off the pace each level")), ("dice", _dice())],
       lambda game, **k: coil.rules(game, **k))
+
+# -------- Lane Dodger
+CAT_DODGE = "Vibecode3D/Lane Dodger"
+_node("VC3D_Runner", "Runner (Vibecode3D)", CAT_DODGE,
+      "You, along the bottom: lanes (0 = run free), keys or the mouse, shape, speed.",
+      [("control", _pick(("arrows", "wasd", "mouse"), "arrows")),
+       ("lanes", _int(5, 0, 7, 1, "0 runs free; 2 to 7 lanes, one press a lane")),
+       ("shape", _pick(dodge.RUNNERS + ("random",), "ship")), ("size", _int(28, 14, 50)),
+       ("speed", _float(9.0, 3.0, 30.0, 0.5)), ("color", _color()), ("dice", _dice())],
+      lambda game, **k: dodge.runner(game, **k))
+_node("VC3D_Hazard", "Hazard (Vibecode3D)", CAT_DODGE,
+      "Something coming down at you. Chain several kinds.",
+      [("shape", _pick(dodge.HAZARDS + ("random",), "rock")), ("size", _int(36, 10, 80)),
+       ("speed", _float(5.0, 1.0, 16.0, 0.5)), ("rate", _float(0.03, 0.001, 0.2, 0.001, "chance each step one appears")),
+       ("wobble", _int(0, 0, 120, 2, "how far it sways from side to side")),
+       ("in_lane", ("BOOLEAN", {"default": True, "tooltip": "with lanes: comes down the middle of one"})),
+       ("spin", ("BOOLEAN", {"default": True})), ("points", _int(5, 0, 50, 1, "for each one that gets past")),
+       ("color", _color()), ("appear", _chance()), ("dice", _dice())],
+      lambda game, **k: dodge.hazard(game, **k))
+_node("VC3D_Pickup", "Pickup (Vibecode3D)", CAT_DODGE,
+      "Something worth catching: a coin, a shield, slow time or an extra life. Chain several.",
+      [("kind", _pick(dodge.PICKUPS + ("random",), "coin")),
+       ("rate", _float(0.006, 0.0, 0.05, 0.001, "chance each step one appears")),
+       ("points", _int(25, 0, 200)), ("color", _color()), ("appear", _chance()), ("dice", _dice())],
+      lambda game, **k: dodge.pickup(game, **k))
+_node("VC3D_DodgeRules", "Dodge Rules (Vibecode3D)", CAT_DODGE,
+      "Lives, levels, steps to last for a level, how much faster each level is, how fast the floor runs.",
+      [("lives", _int(3, 1, 9)), ("levels", _int(3, 1, 9)), ("distance", _int(1200, 100, 9000, 50, "steps to last")),
+       ("level_speed_up", _float(0.25, 0.0, 1.0)), ("scroll", _float(6.0, 0.0, 16.0, 0.5, "floor speed (0 = still)")),
+       ("dice", _dice())],
+      lambda game, **k: dodge.rules(game, **k))
 
 NODE_CLASS_MAPPINGS = {
     "VC3D_GameStart": GameStart,
