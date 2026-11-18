@@ -59,7 +59,7 @@ the Game Browser. Read this before making more nodes or workflows.
 - Output: `LIB_GAMES/Vibecode3D_Games/Vibecode3D_Play_<Name><seed>.livecodescript`. The Game Browser
   lists every `Vibecode3D_Play_*` file in that folder (reopen it to see new ones); Game_Player.exe
   plays it. These generated games are **not** kept in git.
-- Top-down view: `Engine.ResetCamera`, everything at z = 300 (1 unit = 1 pixel), y grows
+- Top-down view: `Camera.Reset`, everything at z = 300 (1 unit = 1 pixel), y grows
   downward, the court's middle at screen y 40. Court half sizes up to 380 x 220 fit the window.
 - Meshes: `Mesh.New()` returns an array; `Mesh.AddVertex`/`Mesh.AddLine` take it by reference
   (`@`), and `the result` after AddVertex is the new vertex's number. Pass meshes into helpers
