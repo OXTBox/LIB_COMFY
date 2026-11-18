@@ -89,3 +89,24 @@ the Game Browser. Read this before making more nodes or workflows.
 - Ideas queued for later: event nodes ("when ball hits paddle" -> "sparks / add block / speed
   up"), a second kit (breakout or a shooter) to prove the parts idea beyond Pong, image nodes for
   textures (6 GB VRAM: SD1.5-class models), a "Play now" switch on Build Game that starts Game_Player.
+
+## The genre kits (18 Nov 2026, Opus, overnight: written and tested without ComfyUI running)
+
+- **How it was tested without ComfyUI.** WSL can run Windows Pythons: Comfy's `standalone-env\python.exe`
+  has PIL; the install's `ComfyUI\.venv\Scripts\python.exe` has torch too (ComfyUI's own interpreter).
+  With the latter the pack loaded (24 nodes, every widget default in range) and each API workflow was
+  run node by node as `/prompt` would, giving a game and a `[1,600,900,3]` preview. Build Game reads parts
+  from `projects_root()`; a `config.json` beside `__init__.py` (`{"projects": "..."}`) points it elsewhere.
+- **Not tested:** the nodes inside the ComfyUI window (how they look, wiring by hand), and playing the
+  games with a person at the keys. The autopilots prove the rules run; they do not prove the games are fun.
+- **The xTalk trap that cost the most:** a one-line `if ... then statement` directly above an `else`
+  line takes that `else` as its own, and the handler stops compiling ("190/166/165" at its `end`).
+  Write the inner `if` as a block, or move it into a function. Every part was checked for the pattern.
+- **One colour per entity, for life.** `Entity.Spawn` sets the colour and nothing in the contract
+  changes it, so a reused entity (the worm's tail becoming its head) keeps its first colour. An
+  `Entity.SetColor` would let kits flash, fade and stripe; for now the worm is one colour.
+- **Headless frames are not real frames.** On the stand-ins one `Game.OnUpdate` is one step; in the
+  Game Player `Vibe.Step` paces steps by the clock, so a tight loop of `Vibe.Step` runs fewer of them.
+- Ideas next: a Lander kit (gravity, fuel, pads), a Rock Blaster kit (inertia, rocks that split), event
+  nodes across kits ("when a brick breaks -> sparks / sound / speed up"), a Title Card node, sound
+  once `Sound.Play` has sounds in the Game Player.
