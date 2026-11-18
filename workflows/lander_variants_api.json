@@ -1,0 +1,109 @@
+{
+ "1": {
+  "class_type": "VC3D_GameStart",
+  "inputs": {
+   "title": "Comfy Lander",
+   "name": "ComfyLander",
+   "seed": 1,
+   "dice": 1.0
+  }
+ },
+ "2": {
+  "class_type": "VC3D_Palette",
+  "inputs": {
+   "hue": 37,
+   "scheme": "random",
+   "dice": 0.5,
+   "game": [
+    "1",
+    0
+   ]
+  }
+ },
+ "3": {
+  "class_type": "VC3D_Arena",
+  "inputs": {
+   "width": 720,
+   "height": 440,
+   "floor": "stars",
+   "spacing": 60,
+   "wall_color": "auto",
+   "dice": 0.5,
+   "game": [
+    "2",
+    0
+   ]
+  }
+ },
+ "4": {
+  "class_type": "VC3D_LanderCraft",
+  "inputs": {
+   "mode": "rotate",
+   "control": "arrows",
+   "thrust": 0.16,
+   "turn": 0.05,
+   "fuel": 900,
+   "size": 24,
+   "color": "auto",
+   "dice": 0.4,
+   "game": [
+    "3",
+    0
+   ]
+  }
+ },
+ "5": {
+  "class_type": "VC3D_Ground",
+  "inputs": {
+   "segments": 24,
+   "roughness": 0.9,
+   "hills": 150,
+   "pads": 3,
+   "ground_color": "auto",
+   "pad_color": "auto",
+   "dice": 0.5,
+   "game": [
+    "4",
+    0
+   ]
+  }
+ },
+ "6": {
+  "class_type": "VC3D_LanderRules",
+  "inputs": {
+   "craft_count": 3,
+   "levels": 3,
+   "gravity": 0.04,
+   "gravity_gain": 0.3,
+   "safe_speed": 1.6,
+   "wind": 0.0,
+   "points": 50,
+   "start_drift": 1.0,
+   "dice": 0.4,
+   "game": [
+    "5",
+    0
+   ]
+  }
+ },
+ "7": {
+  "class_type": "VC3D_BuildGame",
+  "inputs": {
+   "add_seed_to_name": true,
+   "save_to": "LIB_GAMES (the game launcher sees it)",
+   "game": [
+    "6",
+    0
+   ]
+  }
+ },
+ "8": {
+  "class_type": "PreviewImage",
+  "inputs": {
+   "images": [
+    "7",
+    1
+   ]
+  }
+ }
+}

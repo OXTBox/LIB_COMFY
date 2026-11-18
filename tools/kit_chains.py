@@ -83,9 +83,21 @@ def dodge(small=False):
                              "scroll": 6.0, "dice": 0.5})]
 
 
-KITS = {"brick": brick, "wave": wave, "coil": coil, "dodge": dodge}
+def lander(small=False):
+    return start("Comfy Lander", "ComfyLanderSmall" if small else "ComfyLander") + [
+        arena(720, 440, "stars", 60),
+        ("VC3D_LanderCraft", {"mode": "slide" if small else "rotate", "control": "arrows", "thrust": 0.16,
+                              "turn": 0.05, "fuel": 900, "size": 24, "color": AUTO, "dice": 0.4}),
+        ("VC3D_Ground", {"segments": 24, "roughness": 0.9, "hills": 150, "pads": 3, "ground_color": AUTO,
+                         "pad_color": AUTO, "dice": 0.5}),
+        ("VC3D_LanderRules", {"craft_count": 3, "levels": 3, "gravity": 0.03 if small else 0.04,
+                              "gravity_gain": 0.3, "safe_speed": 2.0 if small else 1.6, "wind": 0.0,
+                              "points": 50, "start_drift": 1.0, "dice": 0.4})]
+
+
+KITS = {"brick": brick, "wave": wave, "coil": coil, "dodge": dodge, "lander": lander}
 # what each kit's game is called in xTalk, for tests that read its state
-PREFIX = {"brick": "Brick", "wave": "Wave", "coil": "Coil", "dodge": "Dodge"}
+PREFIX = {"brick": "Brick", "wave": "Wave", "coil": "Coil", "dodge": "Dodge", "lander": "Lander"}
 
 
 def chain(kit, seed=1, small=False):

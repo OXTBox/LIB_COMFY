@@ -266,7 +266,7 @@ class BuildGame:
 # Every kit but Pong: a node is made from (key, display name, category, description, inputs, run).
 # Inputs are (name, ComfyUI spec) in widget order; run(game, **widgets) returns the new game.
 from . import kits  # noqa: E402
-from .kits import brick, wave, coil, dodge  # noqa: E402,F401
+from .kits import brick, wave, coil, dodge, lander  # noqa: E402,F401
 
 CAT_SHARED = "Vibecode3D/Shared"
 
@@ -444,6 +444,27 @@ _node("VC3D_DodgeRules", "Dodge Rules (Vibecode3D)", CAT_DODGE,
        ("level_speed_up", _float(0.25, 0.0, 1.0)), ("scroll", _float(6.0, 0.0, 16.0, 0.5, "floor speed (0 = still)")),
        ("dice", _dice())],
       lambda game, **k: dodge.rules(game, **k))
+
+# -------- Lander
+CAT_LAND = "Vibecode3D/Lander"
+_node("VC3D_LanderCraft", "Lander Craft (Vibecode3D)", CAT_LAND,
+      "Your craft: turn and burn (rotate) or push sideways (slide); thrust, how fast it turns, fuel.",
+      [("mode", _pick(lander.MODES + ("random",), "rotate")), ("control", _pick(("arrows", "wasd"), "arrows")),
+       ("thrust", _float(0.16, 0.05, 0.6, 0.01)), ("turn", _float(0.05, 0.01, 0.15, 0.005)),
+       ("fuel", _int(900, 100, 3000, 50)), ("size", _int(24, 14, 40)), ("color", _color()), ("dice", _dice())],
+      lambda game, **k: lander.craft(game, **k))
+_node("VC3D_Ground", "Ground (Vibecode3D)", CAT_LAND,
+      "The ground: how many segments, how rough, how high the hills, how many pads (new each level).",
+      [("segments", _int(24, 8, 60)), ("roughness", _float(0.9, 0.1, 2.5)), ("hills", _int(150, 40, 300, 5)),
+       ("pads", _int(3, 1, 6)), ("ground_color", _color()), ("pad_color", _color()), ("dice", _dice())],
+      lambda game, **k: lander.ground(game, **k))
+_node("VC3D_LanderRules", "Lander Rules (Vibecode3D)", CAT_LAND,
+      "Craft, levels, the pull and how it grows, the safe landing speed, wind, points, the drift you start with.",
+      [("craft_count", _int(3, 1, 9)), ("levels", _int(3, 1, 9)), ("gravity", _float(0.04, 0.005, 0.2, 0.005)),
+       ("gravity_gain", _float(0.3, 0.0, 1.0)), ("safe_speed", _float(1.6, 0.5, 5.0, 0.1)),
+       ("wind", _float(0.0, 0.0, 0.05, 0.002, "sideways push on the last level (grows level by level)")),
+       ("points", _int(50, 10, 500, 5)), ("start_drift", _float(1.0, 0.0, 4.0, 0.1)), ("dice", _dice())],
+      lambda game, **k: lander.rules(game, **k))
 
 NODE_CLASS_MAPPINGS = {
     "VC3D_GameStart": GameStart,

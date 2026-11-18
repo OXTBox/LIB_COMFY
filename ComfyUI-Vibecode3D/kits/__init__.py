@@ -14,9 +14,9 @@ Pong (cpong) stays in assemble.py as it was; build() there sends every other kit
 import os
 import re
 
-from . import brick, coil, dodge, wave  # noqa: E402
+from . import brick, coil, dodge, lander, wave  # noqa: E402
 
-KITS = {m.KIT: m for m in (brick, wave, coil, dodge)}
+KITS = {m.KIT: m for m in (brick, wave, coil, dodge, lander)}
 
 
 def use_kit(game, kit):
