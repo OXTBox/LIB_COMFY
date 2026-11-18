@@ -4,7 +4,7 @@
 
 The chains are tools/kit_chains.py (the same ones the workflow files hold). Run it with Comfy's
 python.exe (it has PIL) to get a preview PNG beside each game; without PIL the scripts are still
-written. Without out_dir the games go to LIB_GAMES/Vibecode3D_Games, as Build Game's do."""
+written. Without out_dir the games go to LIB_COMFY/games, as Build Game's do."""
 import os, sys, types, importlib.util
 HERE = os.path.dirname(os.path.abspath(__file__))
 PACK = os.path.join(HERE, "..", "ComfyUI-Vibecode3D")

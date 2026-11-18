@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.join(HERE, "..", "tests"))
 import kit_chains  # noqa: E402
 import kit_test  # noqa: E402
 
-BUILD = ("VC3D_BuildGame", {"add_seed_to_name": True, "save_to": "LIB_GAMES (the game launcher sees it)"})
+BUILD = ("VC3D_BuildGame", {"add_seed_to_name": True, "save_to": "LIB_COMFY games (kept apart from LIB_GAMES)"})
 
 
 def widgets(cls, values):

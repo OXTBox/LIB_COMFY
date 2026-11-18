@@ -3,7 +3,7 @@
 ComfyUI as a Blueprint-style editor for Vibecode3D games. Game parts are **nodes**; you chain
 them, set their sliders, press **Queue**, and the **Build Game** node picks up the xTalk script
 parts the chain needs and writes a playable `Vibecode3D_Play_<Name>.livecodescript` into
-`LIB_GAMES/Vibecode3D_Games` (the game launcher opens it like any other game).
+`LIB_COMFY/games`, kept apart from the hand-made games in LIB_GAMES (one ComfyPong demo stays there).
 
 ## Layout
 

@@ -56,9 +56,10 @@ the Game Browser. Read this before making more nodes or workflows.
   (`sCfg[...]`, `sPad[i][...]`, `sGoal[side]`).
 - The header follows the game-launcher format (`## CARD SCRIPT:`, `## CONTROLS`, `## RULES`), so
   `GL.Info` reads title, controls and levels (`Cpong.StartLevel n`).
-- Output: `LIB_GAMES/Vibecode3D_Games/Vibecode3D_Play_<Name><seed>.livecodescript`. The Game Browser
-  lists every `Vibecode3D_Play_*` file in that folder (reopen it to see new ones); Game_Player.exe
-  plays it. These generated games are **not** kept in git.
+- Output: `LIB_COMFY/games/Vibecode3D_Play_<Name><seed>.livecodescript`, kept apart from the hand-made
+  games in LIB_GAMES (owner, 18 Nov: one ComfyPong demo stays in LIB_GAMES as the teaser; the rest
+  would clutter the one-off prototypes). Build Game's `save_to` can still pick LIB_GAMES (old
+  workflows keep working) or ComfyUI's output folder. The owner's tested games are kept in git there.
 - Top-down view: `Camera.Reset`, everything at z = 300 (1 unit = 1 pixel), y grows
   downward, the court's middle at screen y 40. Court half sizes up to 380 x 220 fit the window.
 - Meshes: `Mesh.New()` returns an array; `Mesh.AddVertex`/`Mesh.AddLine` take it by reference

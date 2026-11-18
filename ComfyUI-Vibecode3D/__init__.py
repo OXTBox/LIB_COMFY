@@ -232,7 +232,8 @@ class BuildGame:
         return {"required": {
             "game": GAME,
             "add_seed_to_name": ("BOOLEAN", {"default": True}),
-            "save_to": (["LIB_GAMES (the game launcher sees it)", "ComfyUI output folder"],),
+            "save_to": (["LIB_COMFY games (kept apart from LIB_GAMES)", "ComfyUI output folder",
+                         "LIB_GAMES (the game launcher sees it)"],),
         }}
     RETURN_TYPES = ("STRING", "IMAGE", "STRING")
     RETURN_NAMES = ("script_path", "preview", "script")
@@ -246,6 +247,8 @@ class BuildGame:
         if save_to.startswith("ComfyUI"):
             import folder_paths
             out_dir = os.path.join(folder_paths.get_output_directory(), "vibecode3d")
+        elif save_to.startswith("LIB_GAMES"):
+            out_dir = os.path.join(projects_root(), "LIB_GAMES", "Vibecode3D_Games")
         name = assemble.safe_name(game["name"])
         if add_seed_to_name:
             name += str(game["seed"])

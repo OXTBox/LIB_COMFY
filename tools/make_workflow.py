@@ -15,7 +15,7 @@ CHAIN = [
     ("VC3D_Paddle", ["R", "cpu", "auto", 60, 8.0, 220, 0.5, "auto", 0.4, 0.5], None),
     ("VC3D_Ball", [14, 7.0, 1.05, 16.0, 1, "random", "auto", 0.5], None),
     ("VC3D_MatchRules", [5, 3, 0.15, 0.5], None),
-    ("VC3D_BuildGame", [True, "LIB_GAMES (the game launcher sees it)"], None),
+    ("VC3D_BuildGame", [True, "LIB_COMFY games (kept apart from LIB_GAMES)"], None),
 ]
 PADDLE = ["side", "control", "team", "length", "speed", "inset", "skill", "color", "appear", "dice"]
 NAMES = {"VC3D_Ball": ["size", "speed", "speed_up", "top_speed", "count", "shape", "color", "dice"],

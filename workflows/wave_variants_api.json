@@ -159,7 +159,7 @@
   "class_type": "VC3D_BuildGame",
   "inputs": {
    "add_seed_to_name": true,
-   "save_to": "LIB_GAMES (the game launcher sees it)",
+   "save_to": "LIB_COMFY games (kept apart from LIB_GAMES)",
    "game": [
     "9",
     0
