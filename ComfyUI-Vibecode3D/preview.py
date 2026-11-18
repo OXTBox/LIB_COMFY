@@ -1,12 +1,13 @@
 """A still frame of an assembled game, drawn from the same numbers the script uses."""
 import math
 
-from PIL import Image, ImageDraw
+# PIL is loaded when a picture is drawn, so the pack (and assemble) load without it
 
 W, H = 900, 600
 
 
 def draw(g):
+    from PIL import Image, ImageDraw
     im = Image.new("RGB", (W, H), (0, 0, 0))
     d = ImageDraw.Draw(im)
     if g.get("kit", "cpong") != "cpong":

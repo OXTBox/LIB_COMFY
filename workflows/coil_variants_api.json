@@ -1,0 +1,149 @@
+{
+ "1": {
+  "class_type": "VC3D_GameStart",
+  "inputs": {
+   "title": "Comfy Worm",
+   "name": "ComfyWorm",
+   "seed": 1,
+   "dice": 1.0
+  }
+ },
+ "2": {
+  "class_type": "VC3D_Palette",
+  "inputs": {
+   "hue": 37,
+   "scheme": "random",
+   "dice": 0.5,
+   "game": [
+    "1",
+    0
+   ]
+  }
+ },
+ "3": {
+  "class_type": "VC3D_WormBoard",
+  "inputs": {
+   "columns": 28,
+   "rows": 16,
+   "cell": 22,
+   "edges": "random",
+   "blocks": 6,
+   "block_style": "random",
+   "floor": "random",
+   "wall_color": "auto",
+   "block_color": "auto",
+   "dice": 0.5,
+   "game": [
+    "2",
+    0
+   ]
+  }
+ },
+ "4": {
+  "class_type": "VC3D_Worm",
+  "inputs": {
+   "control": "arrows",
+   "length": 4,
+   "step_frames": 5,
+   "speed_up": 0.1,
+   "fastest": 2,
+   "head": "tri",
+   "color": "auto",
+   "dice": 0.5,
+   "game": [
+    "3",
+    0
+   ]
+  }
+ },
+ "5": {
+  "class_type": "VC3D_Food",
+  "inputs": {
+   "kind": "plain",
+   "count": 2,
+   "points": 10,
+   "grow": 1,
+   "life": 0,
+   "shape": "ring",
+   "color": "auto",
+   "appear": 1.0,
+   "dice": 0.3,
+   "game": [
+    "4",
+    0
+   ]
+  }
+ },
+ "6": {
+  "class_type": "VC3D_Food",
+  "inputs": {
+   "kind": "gold",
+   "count": 1,
+   "points": 50,
+   "grow": 3,
+   "life": 240,
+   "shape": "star",
+   "color": "auto",
+   "appear": 0.8,
+   "dice": 0.3,
+   "game": [
+    "5",
+    0
+   ]
+  }
+ },
+ "7": {
+  "class_type": "VC3D_Food",
+  "inputs": {
+   "kind": "random",
+   "count": 1,
+   "points": 20,
+   "grow": 1,
+   "life": 0,
+   "shape": "random",
+   "color": "auto",
+   "appear": 0.6,
+   "dice": 0.5,
+   "game": [
+    "6",
+    0
+   ]
+  }
+ },
+ "8": {
+  "class_type": "VC3D_WormRules",
+  "inputs": {
+   "lives": 3,
+   "levels": 3,
+   "food_to_eat": 10,
+   "more_each_level": 5,
+   "blocks_each_level": 4,
+   "faster_each_level": 1,
+   "dice": 0.5,
+   "game": [
+    "7",
+    0
+   ]
+  }
+ },
+ "9": {
+  "class_type": "VC3D_BuildGame",
+  "inputs": {
+   "add_seed_to_name": true,
+   "save_to": "LIB_GAMES (the game launcher sees it)",
+   "game": [
+    "8",
+    0
+   ]
+  }
+ },
+ "10": {
+  "class_type": "PreviewImage",
+  "inputs": {
+   "images": [
+    "9",
+    1
+   ]
+  }
+ }
+}

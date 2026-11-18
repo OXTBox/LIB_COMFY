@@ -1,0 +1,159 @@
+{
+ "1": {
+  "class_type": "VC3D_GameStart",
+  "inputs": {
+   "title": "Comfy Dodge",
+   "name": "ComfyDodge",
+   "seed": 1,
+   "dice": 1.0
+  }
+ },
+ "2": {
+  "class_type": "VC3D_Palette",
+  "inputs": {
+   "hue": 37,
+   "scheme": "random",
+   "dice": 0.5,
+   "game": [
+    "1",
+    0
+   ]
+  }
+ },
+ "3": {
+  "class_type": "VC3D_Arena",
+  "inputs": {
+   "width": 600,
+   "height": 440,
+   "floor": "lanes",
+   "spacing": 60,
+   "wall_color": "auto",
+   "dice": 0.3,
+   "game": [
+    "2",
+    0
+   ]
+  }
+ },
+ "4": {
+  "class_type": "VC3D_Runner",
+  "inputs": {
+   "control": "arrows",
+   "lanes": 5,
+   "shape": "ship",
+   "size": 28,
+   "speed": 9.0,
+   "color": "auto",
+   "dice": 0.5,
+   "game": [
+    "3",
+    0
+   ]
+  }
+ },
+ "5": {
+  "class_type": "VC3D_Hazard",
+  "inputs": {
+   "shape": "rock",
+   "size": 36,
+   "speed": 5.0,
+   "rate": 0.03,
+   "wobble": 0,
+   "in_lane": true,
+   "spin": true,
+   "points": 5,
+   "color": "auto",
+   "appear": 1.0,
+   "dice": 0.5,
+   "game": [
+    "4",
+    0
+   ]
+  }
+ },
+ "6": {
+  "class_type": "VC3D_Hazard",
+  "inputs": {
+   "shape": "random",
+   "size": 24,
+   "speed": 7.0,
+   "rate": 0.015,
+   "wobble": 40,
+   "in_lane": false,
+   "spin": false,
+   "points": 10,
+   "color": "auto",
+   "appear": 0.8,
+   "dice": 0.5,
+   "game": [
+    "5",
+    0
+   ]
+  }
+ },
+ "7": {
+  "class_type": "VC3D_Pickup",
+  "inputs": {
+   "kind": "coin",
+   "rate": 0.008,
+   "points": 25,
+   "color": "auto",
+   "appear": 1.0,
+   "dice": 0.3,
+   "game": [
+    "6",
+    0
+   ]
+  }
+ },
+ "8": {
+  "class_type": "VC3D_Pickup",
+  "inputs": {
+   "kind": "random",
+   "rate": 0.003,
+   "points": 10,
+   "color": "auto",
+   "appear": 0.7,
+   "dice": 0.3,
+   "game": [
+    "7",
+    0
+   ]
+  }
+ },
+ "9": {
+  "class_type": "VC3D_DodgeRules",
+  "inputs": {
+   "lives": 3,
+   "levels": 3,
+   "distance": 1200,
+   "level_speed_up": 0.25,
+   "scroll": 6.0,
+   "dice": 0.5,
+   "game": [
+    "8",
+    0
+   ]
+  }
+ },
+ "10": {
+  "class_type": "VC3D_BuildGame",
+  "inputs": {
+   "add_seed_to_name": true,
+   "save_to": "LIB_GAMES (the game launcher sees it)",
+   "game": [
+    "9",
+    0
+   ]
+  }
+ },
+ "11": {
+  "class_type": "PreviewImage",
+  "inputs": {
+   "images": [
+    "10",
+    1
+   ]
+  }
+ }
+}

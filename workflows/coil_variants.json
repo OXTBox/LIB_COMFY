@@ -1,0 +1,512 @@
+{
+ "last_node_id": 10,
+ "last_link_id": 9,
+ "nodes": [
+  {
+   "id": 1,
+   "type": "VC3D_GameStart",
+   "pos": [
+    40,
+    60
+   ],
+   "size": [
+    300,
+    320
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "links": [
+      1
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VC3D_GameStart"
+   },
+   "widgets_values": [
+    "Comfy Worm",
+    "ComfyWorm",
+    1,
+    "randomize",
+    1.0
+   ]
+  },
+  {
+   "id": 2,
+   "type": "VC3D_Palette",
+   "pos": [
+    370,
+    60
+   ],
+   "size": [
+    300,
+    320
+   ],
+   "flags": {},
+   "order": 1,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "link": 1
+    }
+   ],
+   "outputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "links": [
+      2
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VC3D_Palette"
+   },
+   "widgets_values": [
+    37,
+    "random",
+    0.5
+   ]
+  },
+  {
+   "id": 3,
+   "type": "VC3D_WormBoard",
+   "pos": [
+    700,
+    60
+   ],
+   "size": [
+    300,
+    320
+   ],
+   "flags": {},
+   "order": 2,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "link": 2
+    }
+   ],
+   "outputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "links": [
+      3
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VC3D_WormBoard"
+   },
+   "widgets_values": [
+    28,
+    16,
+    22,
+    "random",
+    6,
+    "random",
+    "random",
+    "auto",
+    "auto",
+    0.5
+   ]
+  },
+  {
+   "id": 4,
+   "type": "VC3D_Worm",
+   "pos": [
+    1030,
+    60
+   ],
+   "size": [
+    300,
+    320
+   ],
+   "flags": {},
+   "order": 3,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "link": 3
+    }
+   ],
+   "outputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "links": [
+      4
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VC3D_Worm"
+   },
+   "widgets_values": [
+    "arrows",
+    4,
+    5,
+    0.1,
+    2,
+    "tri",
+    "auto",
+    0.5
+   ]
+  },
+  {
+   "id": 5,
+   "type": "VC3D_Food",
+   "pos": [
+    1360,
+    60
+   ],
+   "size": [
+    300,
+    320
+   ],
+   "flags": {},
+   "order": 4,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "link": 4
+    }
+   ],
+   "outputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "links": [
+      5
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VC3D_Food"
+   },
+   "widgets_values": [
+    "plain",
+    2,
+    10,
+    1,
+    0,
+    "ring",
+    "auto",
+    1.0,
+    0.3
+   ]
+  },
+  {
+   "id": 6,
+   "type": "VC3D_Food",
+   "pos": [
+    40,
+    500
+   ],
+   "size": [
+    300,
+    320
+   ],
+   "flags": {},
+   "order": 5,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "link": 5
+    }
+   ],
+   "outputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "links": [
+      6
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VC3D_Food"
+   },
+   "widgets_values": [
+    "gold",
+    1,
+    50,
+    3,
+    240,
+    "star",
+    "auto",
+    0.8,
+    0.3
+   ]
+  },
+  {
+   "id": 7,
+   "type": "VC3D_Food",
+   "pos": [
+    370,
+    500
+   ],
+   "size": [
+    300,
+    320
+   ],
+   "flags": {},
+   "order": 6,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "link": 6
+    }
+   ],
+   "outputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "links": [
+      7
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VC3D_Food"
+   },
+   "widgets_values": [
+    "random",
+    1,
+    20,
+    1,
+    0,
+    "random",
+    "auto",
+    0.6,
+    0.5
+   ]
+  },
+  {
+   "id": 8,
+   "type": "VC3D_WormRules",
+   "pos": [
+    700,
+    500
+   ],
+   "size": [
+    300,
+    320
+   ],
+   "flags": {},
+   "order": 7,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "link": 7
+    }
+   ],
+   "outputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "links": [
+      8
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VC3D_WormRules"
+   },
+   "widgets_values": [
+    3,
+    3,
+    10,
+    5,
+    4,
+    1,
+    0.5
+   ]
+  },
+  {
+   "id": 9,
+   "type": "VC3D_BuildGame",
+   "pos": [
+    1030,
+    500
+   ],
+   "size": [
+    300,
+    320
+   ],
+   "flags": {},
+   "order": 8,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "link": 8
+    }
+   ],
+   "outputs": [
+    {
+     "name": "script_path",
+     "type": "STRING",
+     "links": null,
+     "slot_index": 0
+    },
+    {
+     "name": "preview",
+     "type": "IMAGE",
+     "links": [
+      9
+     ],
+     "slot_index": 1
+    },
+    {
+     "name": "script",
+     "type": "STRING",
+     "links": null,
+     "slot_index": 2
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VC3D_BuildGame"
+   },
+   "widgets_values": [
+    true,
+    "LIB_GAMES (the game launcher sees it)"
+   ]
+  },
+  {
+   "id": 10,
+   "type": "PreviewImage",
+   "pos": [
+    370,
+    940
+   ],
+   "size": [
+    620,
+    440
+   ],
+   "flags": {},
+   "order": 9,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 9
+    }
+   ],
+   "outputs": [],
+   "properties": {
+    "Node name for S&R": "PreviewImage"
+   },
+   "widgets_values": []
+  }
+ ],
+ "links": [
+  [
+   1,
+   1,
+   0,
+   2,
+   0,
+   "VC3D_GAME"
+  ],
+  [
+   2,
+   2,
+   0,
+   3,
+   0,
+   "VC3D_GAME"
+  ],
+  [
+   3,
+   3,
+   0,
+   4,
+   0,
+   "VC3D_GAME"
+  ],
+  [
+   4,
+   4,
+   0,
+   5,
+   0,
+   "VC3D_GAME"
+  ],
+  [
+   5,
+   5,
+   0,
+   6,
+   0,
+   "VC3D_GAME"
+  ],
+  [
+   6,
+   6,
+   0,
+   7,
+   0,
+   "VC3D_GAME"
+  ],
+  [
+   7,
+   7,
+   0,
+   8,
+   0,
+   "VC3D_GAME"
+  ],
+  [
+   8,
+   8,
+   0,
+   9,
+   0,
+   "VC3D_GAME"
+  ],
+  [
+   9,
+   9,
+   1,
+   10,
+   0,
+   "IMAGE"
+  ]
+ ],
+ "groups": [],
+ "config": {},
+ "extra": {},
+ "version": 0.4
+}

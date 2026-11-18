@@ -1,0 +1,164 @@
+{
+ "1": {
+  "class_type": "VC3D_GameStart",
+  "inputs": {
+   "title": "Comfy Bricks",
+   "name": "ComfyBricks",
+   "seed": 1,
+   "dice": 1.0
+  }
+ },
+ "2": {
+  "class_type": "VC3D_Palette",
+  "inputs": {
+   "hue": 37,
+   "scheme": "random",
+   "dice": 0.5,
+   "game": [
+    "1",
+    0
+   ]
+  }
+ },
+ "3": {
+  "class_type": "VC3D_Arena",
+  "inputs": {
+   "width": 720,
+   "height": 440,
+   "floor": "random",
+   "spacing": 40,
+   "wall_color": "auto",
+   "dice": 0.5,
+   "game": [
+    "2",
+    0
+   ]
+  }
+ },
+ "4": {
+  "class_type": "VC3D_BrickWall",
+  "inputs": {
+   "rows": 6,
+   "columns": 10,
+   "pattern": "random",
+   "next_patterns": "pyramid, random",
+   "brick_height": 16,
+   "gap": 4,
+   "tough_rows": 1,
+   "top_color": "auto",
+   "bottom_color": "auto",
+   "dice": 0.5,
+   "game": [
+    "3",
+    0
+   ]
+  }
+ },
+ "5": {
+  "class_type": "VC3D_Bat",
+  "inputs": {
+   "control": "arrows",
+   "width": 100,
+   "speed": 10.0,
+   "color": "auto",
+   "dice": 0.5,
+   "game": [
+    "4",
+    0
+   ]
+  }
+ },
+ "6": {
+  "class_type": "VC3D_Ball",
+  "inputs": {
+   "size": 12,
+   "speed": 6.0,
+   "speed_up": 1.02,
+   "top_speed": 13.0,
+   "count": 1,
+   "shape": "random",
+   "color": "auto",
+   "dice": 0.5,
+   "game": [
+    "5",
+    0
+   ]
+  }
+ },
+ "7": {
+  "class_type": "VC3D_PowerUp",
+  "inputs": {
+   "kind": "wide",
+   "chance": 0.08,
+   "color": "auto",
+   "appear": 1.0,
+   "dice": 0.3,
+   "game": [
+    "6",
+    0
+   ]
+  }
+ },
+ "8": {
+  "class_type": "VC3D_PowerUp",
+  "inputs": {
+   "kind": "multi",
+   "chance": 0.06,
+   "color": "auto",
+   "appear": 0.7,
+   "dice": 0.3,
+   "game": [
+    "7",
+    0
+   ]
+  }
+ },
+ "9": {
+  "class_type": "VC3D_PowerUp",
+  "inputs": {
+   "kind": "random",
+   "chance": 0.05,
+   "color": "auto",
+   "appear": 0.6,
+   "dice": 0.3,
+   "game": [
+    "8",
+    0
+   ]
+  }
+ },
+ "10": {
+  "class_type": "VC3D_BreakerRules",
+  "inputs": {
+   "lives": 3,
+   "levels": 3,
+   "level_speed_up": 0.12,
+   "points": 10,
+   "dice": 0.5,
+   "game": [
+    "9",
+    0
+   ]
+  }
+ },
+ "11": {
+  "class_type": "VC3D_BuildGame",
+  "inputs": {
+   "add_seed_to_name": true,
+   "save_to": "LIB_GAMES (the game launcher sees it)",
+   "game": [
+    "10",
+    0
+   ]
+  }
+ },
+ "12": {
+  "class_type": "PreviewImage",
+  "inputs": {
+   "images": [
+    "11",
+    1
+   ]
+  }
+ }
+}

@@ -1,0 +1,178 @@
+{
+ "1": {
+  "class_type": "VC3D_GameStart",
+  "inputs": {
+   "title": "Comfy Waves",
+   "name": "ComfyWaves",
+   "seed": 1,
+   "dice": 1.0
+  }
+ },
+ "2": {
+  "class_type": "VC3D_Palette",
+  "inputs": {
+   "hue": 37,
+   "scheme": "random",
+   "dice": 0.5,
+   "game": [
+    "1",
+    0
+   ]
+  }
+ },
+ "3": {
+  "class_type": "VC3D_Arena",
+  "inputs": {
+   "width": 720,
+   "height": 440,
+   "floor": "stars",
+   "spacing": 50,
+   "wall_color": "auto",
+   "dice": 0.5,
+   "game": [
+    "2",
+    0
+   ]
+  }
+ },
+ "4": {
+  "class_type": "VC3D_ShooterShip",
+  "inputs": {
+   "control": "arrows",
+   "shape": "random",
+   "size": 26,
+   "speed": 6.0,
+   "fire_delay": 12,
+   "shot_speed": 11.0,
+   "max_shots": 2,
+   "color": "auto",
+   "dice": 0.5,
+   "game": [
+    "3",
+    0
+   ]
+  }
+ },
+ "5": {
+  "class_type": "VC3D_EnemyWave",
+  "inputs": {
+   "formation": "block",
+   "foe": "crab",
+   "rows": 4,
+   "columns": 8,
+   "size": 24,
+   "gap": 12,
+   "speed": 1.0,
+   "drop": 14,
+   "fire": 0.002,
+   "dive": 0.0,
+   "points": 10,
+   "top_color": "auto",
+   "bottom_color": "auto",
+   "appear": 1.0,
+   "dice": 0.4,
+   "game": [
+    "4",
+    0
+   ]
+  }
+ },
+ "6": {
+  "class_type": "VC3D_EnemyWave",
+  "inputs": {
+   "formation": "random",
+   "foe": "random",
+   "rows": 4,
+   "columns": 9,
+   "size": 22,
+   "gap": 12,
+   "speed": 1.4,
+   "drop": 12,
+   "fire": 0.003,
+   "dive": 0.002,
+   "points": 20,
+   "top_color": "auto",
+   "bottom_color": "auto",
+   "appear": 1.0,
+   "dice": 0.6,
+   "game": [
+    "5",
+    0
+   ]
+  }
+ },
+ "7": {
+  "class_type": "VC3D_EnemyWave",
+  "inputs": {
+   "formation": "swarm",
+   "foe": "random",
+   "rows": 3,
+   "columns": 7,
+   "size": 26,
+   "gap": 16,
+   "speed": 1.8,
+   "drop": 10,
+   "fire": 0.004,
+   "dive": 0.004,
+   "points": 30,
+   "top_color": "auto",
+   "bottom_color": "auto",
+   "appear": 0.8,
+   "dice": 0.6,
+   "game": [
+    "6",
+    0
+   ]
+  }
+ },
+ "8": {
+  "class_type": "VC3D_Shields",
+  "inputs": {
+   "count": 4,
+   "columns": 6,
+   "rows": 3,
+   "cell": 8,
+   "hits": 2,
+   "color": "auto",
+   "dice": 0.5,
+   "game": [
+    "7",
+    0
+   ]
+  }
+ },
+ "9": {
+  "class_type": "VC3D_WaveRules",
+  "inputs": {
+   "ships": 3,
+   "waves_to_win": 0,
+   "round_speed_up": 0.25,
+   "rush": 1.5,
+   "dice": 0.5,
+   "game": [
+    "8",
+    0
+   ]
+  }
+ },
+ "10": {
+  "class_type": "VC3D_BuildGame",
+  "inputs": {
+   "add_seed_to_name": true,
+   "save_to": "LIB_GAMES (the game launcher sees it)",
+   "game": [
+    "9",
+    0
+   ]
+  }
+ },
+ "11": {
+  "class_type": "PreviewImage",
+  "inputs": {
+   "images": [
+    "10",
+    1
+   ]
+  }
+ }
+}
