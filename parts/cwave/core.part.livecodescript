@@ -192,6 +192,7 @@ on Wave.MoveShip pKeys
    local tD, tFire, tTarget, tShots
    if sAuto is true then
       put Wave.AutoTarget() into tTarget
+      put Wave.Dodge(tTarget) into tTarget
       put Vec.Clamp(tTarget - sShip["x"], -sCfg["shipSpeed"], sCfg["shipSpeed"]) into tD
       add tD to sShip["x"]
       put abs(tTarget - sShip["x"]) < 20 into tFire
@@ -214,19 +215,39 @@ on Wave.MoveShip pKeys
    end if
 end Wave.MoveShip
 
--- tests and the demo: the x of the lowest living foe
+-- tests and the demo: where to be to hit the lowest living foe, leading it by its march
 function Wave.AutoTarget
-   local n, tY, tX
+   local n, tY, tX, tSpeed, tSteps
    put -9999 into tY
    put 0 into tX
    repeat with n = 1 to sFoeN
       if sFoe[n]["live"] and sFoe[n]["y"] > tY then
          put sFoe[n]["y"] into tY
          put sFoe[n]["x"] into tX
+         if sFoe[n]["mode"] is "line" then
+            put sNow["speed"] * (1 + sCfg["rush"] * (1 - sAlive / sFoeN)) into tSpeed
+            put (sShip["y"] - sFoe[n]["y"]) / sCfg["shotSpeed"] into tSteps
+            add sMarchDir * tSpeed * tSteps to tX
+         end if
       end if
    end repeat
-   return tX
+   return Vec.Clamp(tX, -sCfg["hw"] + 20, sCfg["hw"] - 20)
 end Wave.AutoTarget
+
+-- the autopilot steps aside from a bomb coming down on it
+function Wave.Dodge pTarget
+   local k, tNear
+   put sCfg["shipSize"] + 10 into tNear
+   repeat for each key k in sBomb
+      if sBomb[k]["y"] > sShip["y"] - 160 and sBomb[k]["y"] < sShip["y"] and abs(sBomb[k]["x"] - sShip["x"]) < tNear then
+         if sBomb[k]["x"] < sShip["x"] or sShip["x"] < -sCfg["hw"] + 60 then
+            if sShip["x"] < sCfg["hw"] - 60 then return sBomb[k]["x"] + tNear * 1.5
+         end if
+         return sBomb[k]["x"] - tNear * 1.5
+      end if
+   end repeat
+   return pTarget
+end Wave.Dodge
 
 on Wave.TestAuto pOn
    put pOn into sAuto

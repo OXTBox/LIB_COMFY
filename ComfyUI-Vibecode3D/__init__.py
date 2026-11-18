@@ -188,7 +188,10 @@ class Ball:
         g["ball"] = {
             "size": assemble.roll(g, "bs", size, 4, 40, dice, True),
             "speed": assemble.roll(g, "bv", speed, 2, 20, dice),
-            "gain": assemble.roll(g, "bg", speed_up, 1.0, 1.3, dice),
+            # Pong keeps its first dice (same seed, same game); other kits roll only the part
+            # above 1, so a speed-up of 1.02 stays near 1.02 instead of reaching 1.3
+            "gain": assemble.roll(g, "bg", speed_up, 1.0, 1.3, dice) if g.get("kit", "cpong") == "cpong"
+            else round(1 + assemble.roll(g, "bg", speed_up - 1, 0.0, 0.3, dice), 3),
             "max": assemble.roll(g, "bm", top_speed, 4, 30, dice),
             "count": assemble.roll(g, "bn", count, 1, 3, dice * 0.5, True),
             "shape": assemble.roll_choice(g, "bh", shape, assemble.SHAPES, dice),
@@ -266,7 +269,7 @@ class BuildGame:
 # Every kit but Pong: a node is made from (key, display name, category, description, inputs, run).
 # Inputs are (name, ComfyUI spec) in widget order; run(game, **widgets) returns the new game.
 from . import kits  # noqa: E402
-from .kits import brick, wave, coil, dodge, lander  # noqa: E402,F401
+from .kits import brick, wave, coil, dodge, lander, rocks  # noqa: E402,F401
 
 CAT_SHARED = "Vibecode3D/Shared"
 
@@ -465,6 +468,34 @@ _node("VC3D_LanderRules", "Lander Rules (Vibecode3D)", CAT_LAND,
        ("wind", _float(0.0, 0.0, 0.05, 0.002, "sideways push on the last level (grows level by level)")),
        ("points", _int(50, 10, 500, 5)), ("start_drift", _float(1.0, 0.0, 4.0, 0.1)), ("dice", _dice())],
       lambda game, **k: lander.rules(game, **k))
+
+# -------- Rock Blaster
+CAT_ROCK = "Vibecode3D/Rock Blaster"
+_node("VC3D_BlasterShip", "Blaster Ship (Vibecode3D)", CAT_ROCK,
+      "Your ship: it turns, thrusts and drifts (drag 1 = no slowing), and how it fires.",
+      [("control", _pick(("arrows", "wasd"), "arrows")), ("shape", _pick(rocks.SHIPS + ("random",), "ship")),
+       ("size", _int(22, 14, 40)), ("thrust", _float(0.25, 0.05, 1.0, 0.01)), ("turn", _float(0.09, 0.03, 0.25, 0.005)),
+       ("drag", _float(0.99, 0.9, 1.0, 0.005)), ("top_speed", _float(8.0, 2.0, 16.0, 0.5)),
+       ("fire_delay", _int(8, 2, 30)), ("shot_speed", _float(9.0, 4.0, 20.0, 0.5)),
+       ("shot_life", _int(50, 10, 120, 1, "steps a shot flies")), ("max_shots", _int(4, 1, 8)),
+       ("color", _color()), ("dice", _dice())],
+      lambda game, **k: rocks.ship(game, **k))
+_node("VC3D_RockField", "Rock Field (Vibecode3D)", CAT_ROCK,
+      "The rocks: how many big ones to start, how many more each level, their size, speed and points.",
+      [("rocks", _int(4, 1, 12)), ("more_each_level", _int(1, 0, 4)), ("size", _int(44, 20, 70, 1, "a big rock's radius")),
+       ("speed", _float(1.2, 0.3, 4.0, 0.1)), ("points", _int(20, 5, 100, 1, "a big one; middle x2, small x3")),
+       ("color", _color()), ("dice", _dice())],
+      lambda game, **k: rocks.field(game, **k))
+_node("VC3D_Saucer", "Saucer (Vibecode3D)", CAT_ROCK,
+      "Now and then a saucer crosses and shoots at you; worth a lot.",
+      [("chance", _float(0.002, 0.0, 0.02, 0.0005, "chance each step one appears")), ("points", _int(500, 50, 2000, 50)),
+       ("color", _color()), ("appear", _chance()), ("dice", _dice())],
+      lambda game, **k: rocks.saucer(game, **k))
+_node("VC3D_RockRules", "Rock Rules (Vibecode3D)", CAT_ROCK,
+      "Ships, how much faster the rocks are each level, an extra ship every so many points (0 = never).",
+      [("ships", _int(3, 1, 9)), ("level_speed_up", _float(0.15, 0.0, 1.0)),
+       ("extra_ship_every", _int(10000, 0, 50000, 500)), ("dice", _dice())],
+      lambda game, **k: rocks.rules(game, **k))
 
 NODE_CLASS_MAPPINGS = {
     "VC3D_GameStart": GameStart,

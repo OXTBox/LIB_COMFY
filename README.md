@@ -12,9 +12,9 @@ parts the chain needs and writes a playable `Vibecode3D_Play_<Name>.livecodescri
 | `ComfyUI-Vibecode3D/` | the node pack (category **Vibecode3D/Vectors**). `assemble.py` builds games and needs no ComfyUI; `preview.py` draws a still frame |
 | `parts/cpong/` | the script parts: `core` (always), one `court_*`, one `ball_*`, `control_keys` and/or `control_cpu` |
 | `parts/common/vec.part.livecodescript` | shared by every kit but Pong: wire shapes (`Vec.Shape`), floors (`Vec.Decor`), keys, mouse |
-| `parts/cbrick` `cwave` `ccoil` `cdodge` | the genre kits' game parts (one `core` each) |
+| `parts/cbrick` `cwave` `ccoil` `cdodge` `cland` `crock` | the genre kits' game parts (one `core` each) |
 | `ComfyUI-Vibecode3D/kits/` | one module a genre kit: what its nodes set, fix-ups, the config handler, header, preview |
-| `workflows/<kit>_variants.json` | a starter chain per kit (brick, wave, coil, dodge), made by `tools/make_kit_workflows.py` from `tools/kit_chains.py` |
+| `workflows/<kit>_variants.json` | a starter chain per kit (brick, wave, coil, dodge, lander, rocks), made by `tools/make_kit_workflows.py` from `tools/kit_chains.py` |
 | `tests/kit_test.py KIT SEED [dir] [small]` | builds a kit's chain through the node classes (any python3; previews need PIL) |
 | `tests/kit_play_test.py` | builds every kit and plays it headless in OXT-Beyond: stand-ins with the autopilot, then the real engine |
 | `workflows/vector_pong_variants.json` | drag this into ComfyUI: Game Start, Palette, Court, 4 Paddles, Ball, Match Rules, Build Game, Preview |
@@ -50,6 +50,8 @@ kit but Pong and the worm. Nodes marked *chain several* add one more each time.
 | Wave Shooter (`cwave`) | Shooter Ship, Enemy Wave *(chain several: one a level)*, Shields, Wave Rules | a formation marches and steps down; bombs, divers; shields wear away; waves come round faster |
 | Grid Worm (`ccoil`) | Worm Board, Worm, Food *(chain several kinds)*, Worm Rules | grow by eating; walls or wrapping edges; blocks grow each level; gold, shrink and slow food |
 | Lane Dodger (`cdodge`) | Runner, Hazard *(chain several)*, Pickup *(chain several)*, Dodge Rules | last the distance; lanes or free running; coins, shields, slow time, extra lives; the floor scrolls |
+| Lander (`cland`) | Lander Craft, Ground, Lander Rules | gravity and fuel; turn-and-burn or slide; set down slowly and upright on a pad (narrow pads score more); new ground and a stronger pull each level, wind if you like |
+| Rock Blaster (`crock`) | Blaster Ship, Rock Field, Saucer, Rock Rules | turn, thrust and drift through wrapping space; big rocks split in two, then two again; a saucer now and then; one more rock each level |
 
 Each game has an autopilot for tests and demos (`Brick.TestAuto true` ...) and a `State()` line.
 

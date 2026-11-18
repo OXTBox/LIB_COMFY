@@ -239,7 +239,7 @@ on Brick.TestAuto pOn
 end Brick.TestAuto
 
 on Brick.AutoBat
-   local i, tBest, tY, tTarget
+   local i, tBest, tY, tTarget, r, c, tAim, tGo, tDX, tDY
    put -9999 into tY
    repeat with i = 1 to sBallN
       if sBall[i]["live"] and sBall[i]["dy"] > 0 and sBall[i]["y"] > tY then
@@ -248,7 +248,24 @@ on Brick.AutoBat
       end if
    end repeat
    if tBest is empty then exit Brick.AutoBat
-   put sBall[tBest]["x"] + sBat["half"] * 0.35 * sin(sTick / 40) into tTarget
+   -- aim: the lowest brick still standing (the first found), hit where the bounce sends the ball at it
+   repeat with r = sCfg["rows"] down to 1
+      repeat with c = 1 to sCfg["cols"]
+         if sCell[r][c]["hp"] is a number and sCell[r][c]["hp"] > 0 then
+            put c & "," & r into tAim
+            exit repeat
+         end if
+      end repeat
+      if tAim is not empty then exit repeat
+   end repeat
+   put 0 into tGo
+   if tAim is not empty then
+      put Brick.CellX(item 1 of tAim) - sBall[tBest]["x"] into tDX
+      put sBat["y"] - Brick.CellY(item 2 of tAim) into tDY
+      -- the bounce angle is (where it lands on the bat / half the bat) * 1.05, 0 straight up
+      put Vec.Clamp(atan2(tDX, tDY) / 1.05, -0.9, 0.9) * sBat["half"] into tGo
+   end if
+   put sBall[tBest]["x"] - tGo into tTarget
    add Vec.Clamp(tTarget - sBat["x"], -sCfg["batSpeed"] * 1.5, sCfg["batSpeed"] * 1.5) to sBat["x"]
 end Brick.AutoBat
 
@@ -469,14 +486,17 @@ on Brick.ShowHUD
    end if
 end Brick.ShowHUD
 
--- for tests: level|lives|score|bricks left|balls in play|serving|over
+-- for tests: level|lives|score|bricks left|balls in play|serving|over|first live ball x,y,dx,dy
 function Brick.State
-   local i, tLive
+   local i, tLive, tBall
    put 0 into tLive
    repeat with i = 1 to sBallN
-      if sBall[i]["live"] then add 1 to tLive
+      if sBall[i]["live"] then
+         add 1 to tLive
+         if tBall is empty then put round(sBall[i]["x"]) & "," & round(sBall[i]["y"]) & "," & round(sBall[i]["dx"], 2) & "," & round(sBall[i]["dy"], 2) into tBall
+      end if
    end repeat
-   return sLevel & "|" & sLives & "|" & sScore & "|" & sLeft & "|" & tLive & "|" & (sServeT > 0) & "|" & sOver
+   return sLevel & "|" & sLives & "|" & sScore & "|" & sLeft & "|" & tLive & "|" & (sServeT > 0) & "|" & sOver & "|" & tBall
 end Brick.State
 
 on Game.OnStop

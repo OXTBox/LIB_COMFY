@@ -95,9 +95,21 @@ def lander(small=False):
                               "points": 50, "start_drift": 1.0, "dice": 0.4})]
 
 
-KITS = {"brick": brick, "wave": wave, "coil": coil, "dodge": dodge, "lander": lander}
+def rocks(small=False):
+    return start("Comfy Rocks", "ComfyRocksSmall" if small else "ComfyRocks") + [
+        arena(760, 440, "stars", 60),
+        ("VC3D_BlasterShip", {"control": "arrows", "shape": "ship", "size": 22, "thrust": 0.25, "turn": 0.09,
+                              "drag": 0.99, "top_speed": 8.0, "fire_delay": 8, "shot_speed": 9.0, "shot_life": 50,
+                              "max_shots": 4, "color": AUTO, "dice": 0.4}),
+        ("VC3D_RockField", {"rocks": 1 if small else 4, "more_each_level": 1, "size": 44, "speed": 1.2, "points": 20,
+                            "color": AUTO, "dice": 0.4}),
+        ("VC3D_Saucer", {"chance": 0.002, "points": 500, "color": AUTO, "appear": 0.0 if small else 1.0, "dice": 0.4}),
+        ("VC3D_RockRules", {"ships": 3, "level_speed_up": 0.15, "extra_ship_every": 10000, "dice": 0.3})]
+
+
+KITS = {"brick": brick, "wave": wave, "coil": coil, "dodge": dodge, "lander": lander, "rocks": rocks}
 # what each kit's game is called in xTalk, for tests that read its state
-PREFIX = {"brick": "Brick", "wave": "Wave", "coil": "Coil", "dodge": "Dodge", "lander": "Lander"}
+PREFIX = {"brick": "Brick", "wave": "Wave", "coil": "Coil", "dodge": "Dodge", "lander": "Lander", "rocks": "Rocks"}
 
 
 def chain(kit, seed=1, small=False):

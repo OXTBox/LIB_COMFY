@@ -105,7 +105,7 @@ def main(argv):
             prefix = kit_chains.PREFIX[kit]
             small, _, _ = kit_test.build(vc, kit, seed, out_dir, small=True, root=projects)
             full, _, _ = kit_test.build(vc, kit, seed, out_dir, small=False, root=projects)
-            text = run_body(projects, body_stubs(small, prefix, stubs, aliases, [600, 1200, 1800]), tmp, kit + "_small")
+            text = run_body(projects, body_stubs(small, prefix, stubs, aliases, [600, 1200, 1800, 2400]), tmp, kit + "_small")
             states = [l[6:] for l in text.splitlines() if l.startswith("STATE ")]
             ok = "PASS compiles" in text and "FAIL" not in text and states and max(level_of(s) for s in states) >= 2
             print("%s %s small: gets past level 1 (%s)" % ("PASS" if ok else "FAIL", kit, " / ".join(states) or text.strip()[-300:]))

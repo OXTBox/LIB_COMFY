@@ -107,6 +107,14 @@ the Game Browser. Read this before making more nodes or workflows.
   `Entity.SetColor` would let kits flash, fade and stripe; for now the worm is one colour.
 - **Headless frames are not real frames.** On the stand-ins one `Game.OnUpdate` is one step; in the
   Game Player `Vibe.Step` paces steps by the clock, so a tight loop of `Vibe.Step` runs fewer of them.
-- Ideas next: a Lander kit (gravity, fuel, pads), a Rock Blaster kit (inertia, rocks that split), event
-  nodes across kits ("when a brick breaks -> sparks / sound / speed up"), a Title Card node, sound
+- Lander and Rock Blaster followed the same night. Rotation: `Entity.SetRotation id, 0, 0, a` turns a
+  shape drawn pointing up (-y) so its nose is at (sin a, -cos a): positive a leans right on screen
+  (the engine's Mat3.RotZYX is the standard one), the same way the kits' thrust pushes.
+- **Dice on a ratio.** `roll()` wanders by a share of the value, so a speed-up of 1.02 could roll 1.3.
+  The Ball node now rolls only the part above 1 for every kit but Pong (Pong keeps its first dice, so a
+  saved Pong seed makes the same game).
+- **Autopilots must play like a person would, or a test stalls:** the brick autopilot aims at the lowest
+  brick (without aiming the ball went up the same gap for ever); the wave autopilot leads its target and
+  steps aside from bombs. `tests/kit_play_test.py --seed N` was run for seeds 1 to 10.
+- Ideas next: event nodes across kits ("when a brick breaks -> sparks / sound / speed up"), a Title Card node, sound
   once `Sound.Play` has sounds in the Game Player.
