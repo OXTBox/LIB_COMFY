@@ -99,6 +99,23 @@ def pick_color(game, given, role, salt, dice):
     return rgb
 
 
+# ---------------------------------------------------------------- the shared Arena node
+FLOORS = ("grid", "rings", "stars", "dots", "lanes", "bare")
+
+
+def arena(game, width, height, floor, spacing, wall_color, dice):
+    """the play area for every kit but Pong (Pong has its Court): half sizes, floor, wall colour."""
+    import copy
+    g = copy.deepcopy(game)
+    g["arena"] = {"hw": roll(g, "aw", width, 300, 780, dice, True) // 2,
+                  "hh": roll(g, "ah", height, 240, 460, dice, True) // 2,
+                  "cy": 40,
+                  "floor": roll_choice(g, "af", floor, FLOORS, dice),
+                  "grid": roll(g, "ag", spacing, 16, 160, dice, True),
+                  "wall": pick_color(g, wall_color, "wall", "awc", dice)}
+    return g
+
+
 # ---------------------------------------------------------------- build
 def _fixups(game):
     """make the game playable whatever the nodes said."""
@@ -237,6 +254,9 @@ def header(g, name, parts):
 
 def build(game, projects_root, out_dir=None, name=None):
     """returns (path, script, g) with g the fixed-up game (for the preview)."""
+    if game.get("kit", KIT) != KIT:
+        from . import kits
+        return kits.build(game, projects_root, out_dir, safe_name(name or game["name"]))
     g = _fixups(game)
     name = safe_name(name or g["name"])
     parts = parts_needed(g)

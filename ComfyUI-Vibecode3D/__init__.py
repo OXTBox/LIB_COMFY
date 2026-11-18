@@ -262,6 +262,125 @@ class BuildGame:
         return {"ui": ui, "result": (path, tensor, script)}
 
 
+# ---------------------------------------------------------------- the genre kits
+# Every kit but Pong: a node is made from (key, display name, category, description, inputs, run).
+# Inputs are (name, ComfyUI spec) in widget order; run(game, **widgets) returns the new game.
+from . import kits  # noqa: E402
+from .kits import brick, wave  # noqa: E402,F401
+
+CAT_SHARED = "Vibecode3D/Shared"
+
+
+def _node(key, display, category, description, inputs, run):
+    spec = {"required": dict([("game", GAME)] + list(inputs))}
+
+    def INPUT_TYPES(cls):
+        return spec
+
+    def go(self, game, **kw):
+        return (run(game, **kw),)
+    cls = type(key, (), {"INPUT_TYPES": classmethod(INPUT_TYPES), "RETURN_TYPES": GAME,
+                         "RETURN_NAMES": ("game",), "FUNCTION": "run", "CATEGORY": category,
+                         "DESCRIPTION": description, "run": go})
+    _GENRE_NODES.append((key, display, cls))
+    return cls
+
+
+_GENRE_NODES = []
+
+
+def _int(default, lo, hi, step=1, tip=None):
+    d = {"default": default, "min": lo, "max": hi, "step": step}
+    if tip:
+        d["tooltip"] = tip
+    return ("INT", d)
+
+
+def _float(default, lo, hi, step=0.05, tip=None):
+    d = {"default": default, "min": lo, "max": hi, "step": step}
+    if tip:
+        d["tooltip"] = tip
+    return ("FLOAT", d)
+
+
+def _pick(choices, default, tip=None):
+    d = {"default": default}
+    if tip:
+        d["tooltip"] = tip
+    return (list(choices), d)
+
+
+def _chance(default=1.0, tip="chance this node is in the game for a seed (1 = always)"):
+    return _float(default, 0.0, 1.0, 0.05, tip)
+
+
+_node("VC3D_Arena", "Arena (Vibecode3D)", CAT_SHARED,
+      "The play area for every kit but Pong: its size, the floor drawn under it, the wall colour.",
+      [("width", _int(720, 300, 780, 10)), ("height", _int(420, 240, 460, 10)),
+       ("floor", _pick(assemble.FLOORS + ("random",), "grid")),
+       ("spacing", _int(60, 16, 160, 2, "the floor's grid / ring / lane spacing")),
+       ("wall_color", _color()), ("dice", _dice())],
+      lambda game, **k: assemble.arena(game, **k))
+
+# -------- Brick Breaker
+CAT_BRICK = "Vibecode3D/Brick Breaker"
+_node("VC3D_BrickWall", "Brick Wall (Vibecode3D)", CAT_BRICK,
+      "The wall of bricks: rows, columns, the pattern for level 1 and the patterns after it.",
+      [("rows", _int(6, 1, 12)), ("columns", _int(10, 3, 16)),
+       ("pattern", _pick(brick.PATTERNS + ("random",), "solid")),
+       ("next_patterns", ("STRING", {"default": "pyramid, checker", "tooltip": "levels 2, 3...: names from the pattern list, commas between (random allowed); they repeat"})),
+       ("brick_height", _int(16, 8, 30)), ("gap", _int(4, 1, 12)),
+       ("tough_rows", _int(1, 0, 12, 1, "top rows that take two hits")),
+       ("top_color", _color()), ("bottom_color", _color()), ("dice", _dice())],
+      lambda game, rows, columns, **k: brick.wall(game, rows, columns, **k))
+_node("VC3D_Bat", "Bat (Vibecode3D)", CAT_BRICK,
+      "The player's bat at the bottom: keys or the mouse, width, speed.",
+      [("control", _pick(("arrows", "wasd", "mouse"), "arrows")), ("width", _int(100, 30, 260, 5)),
+       ("speed", _float(10.0, 3.0, 24.0, 0.5)), ("color", _color()), ("dice", _dice())],
+      lambda game, **k: brick.bat(game, **k))
+_node("VC3D_PowerUp", "Power-Up (Vibecode3D)", CAT_BRICK,
+      "Something that may fall from a broken brick. Chain several for several kinds.",
+      [("kind", _pick(brick.POWERS + ("random",), "wide")),
+       ("chance", _float(0.08, 0.0, 1.0, 0.01, "chance a broken brick drops it")),
+       ("color", _color()), ("appear", _chance()), ("dice", _dice())],
+      lambda game, **k: brick.power(game, **k))
+_node("VC3D_BreakerRules", "Breaker Rules (Vibecode3D)", CAT_BRICK,
+      "Lives, levels, how much faster each level is, points a brick.",
+      [("lives", _int(3, 1, 9)), ("levels", _int(3, 1, 9)), ("level_speed_up", _float(0.12, 0.0, 0.6)),
+       ("points", _int(10, 1, 100)), ("dice", _dice())],
+      lambda game, **k: brick.rules(game, **k))
+
+# -------- Wave Shooter
+CAT_WAVE = "Vibecode3D/Wave Shooter"
+_node("VC3D_ShooterShip", "Shooter Ship (Vibecode3D)", CAT_WAVE,
+      "Your ship along the bottom: control, shape, speed, how fast it fires.",
+      [("control", _pick(("arrows", "wasd"), "arrows")), ("shape", _pick(wave.SHIPS + ("random",), "ship")),
+       ("size", _int(26, 14, 48)), ("speed", _float(6.0, 2.0, 16.0, 0.5)),
+       ("fire_delay", _int(12, 2, 40, 1, "steps between shots")), ("shot_speed", _float(11.0, 4.0, 24.0, 0.5)),
+       ("max_shots", _int(2, 1, 6, 1, "shots in the air at once")), ("color", _color()), ("dice", _dice())],
+      lambda game, **k: wave.ship(game, **k))
+_node("VC3D_EnemyWave", "Enemy Wave (Vibecode3D)", CAT_WAVE,
+      "One wave: its formation and foes. Chain several: level 1 is the first, and round they go, faster each time.",
+      [("formation", _pick(wave.FORMATIONS + ("random",), "block")), ("foe", _pick(wave.FOES + ("random",), "crab")),
+       ("rows", _int(4, 1, 7)), ("columns", _int(8, 2, 14)), ("size", _int(24, 12, 44)), ("gap", _int(12, 2, 30)),
+       ("speed", _float(1.0, 0.2, 6.0, 0.1, "march speed")), ("drop", _int(14, 0, 40, 1, "step down at each wall")),
+       ("fire", _float(0.002, 0.0, 0.02, 0.0005, "chance a foe drops a bomb each step")),
+       ("dive", _float(0.001, 0.0, 0.02, 0.0005, "chance each step that one foe dives at you")),
+       ("points", _int(10, 1, 200)), ("top_color", _color()), ("bottom_color", _color()),
+       ("appear", _chance()), ("dice", _dice())],
+      lambda game, **k: wave.wave(game, **k))
+_node("VC3D_Shields", "Shields (Vibecode3D)", CAT_WAVE,
+      "Blocks between you and the wave that wear away under shots and bombs.",
+      [("count", _int(4, 0, 6)), ("columns", _int(6, 1, 10)), ("rows", _int(3, 1, 5)),
+       ("cell", _int(8, 4, 16, 1, "size of one block")), ("hits", _int(2, 1, 5, 1, "hits a block takes")),
+       ("color", _color()), ("dice", _dice())],
+      lambda game, **k: wave.shields(game, **k))
+_node("VC3D_WaveRules", "Wave Rules (Vibecode3D)", CAT_WAVE,
+      "Ships, how many waves win (0 = play on), how much faster each time round, how much the last few rush.",
+      [("ships", _int(3, 1, 9)), ("waves_to_win", _int(0, 0, 30)), ("round_speed_up", _float(0.25, 0.0, 1.0)),
+       ("rush", _float(1.5, 0.0, 4.0, 0.1, "speed added as the wave thins out")), ("dice", _dice())],
+      lambda game, **k: wave.rules(game, **k))
+
 NODE_CLASS_MAPPINGS = {
     "VC3D_GameStart": GameStart,
     "VC3D_Palette": Palette,
@@ -280,3 +399,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VC3D_MatchRules": "Match Rules (Vibecode3D)",
     "VC3D_BuildGame": "Build Game (Vibecode3D)",
 }
+for _key, _display, _cls in _GENRE_NODES:
+    NODE_CLASS_MAPPINGS[_key] = _cls
+    NODE_DISPLAY_NAME_MAPPINGS[_key] = _display
