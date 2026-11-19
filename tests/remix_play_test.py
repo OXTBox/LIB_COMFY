@@ -16,6 +16,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import kit_play_test as kp  # noqa: E402
 import kit_test  # noqa: E402
+sys.path.insert(0, os.path.join(HERE, "..", "tools"))
+import kit_chains  # noqa: E402
 
 LABEL = {"squad": "Squad Buggy", "toss": "Vector Toss"}
 PREFIX = {"squad": "Squad", "toss": "VT"}
@@ -99,14 +101,19 @@ def main(argv):
             fails += not ok
             seen = set()
             for seed in seeds:
-                g = node().run(LABEL[game], seed, 1.0, "auto", "auto")[0]
+                # even seeds: the whole chain (every node, Mutate always); odd seeds: Remix Source alone
+                if seed % 2 == 0:
+                    g = kit_test.run_chain(vc, kit_chains.remix_chain(vc, game, seed, 1.0, 1.0))
+                else:
+                    g = node().run(LABEL[game], seed, 1.0, "auto", "auto")[0]
                 path, script, gg = vc.assemble.build(g, projects, out, "%s%d" % (g["name"], seed))
                 seen.add(tuple(sorted(gg["k"]["vals"].items())))
                 text = kp.run_body(projects, body(game, path, stubs, aliases), tmp, "%s_%d" % (game, seed))
                 states = [l[6:] for l in text.splitlines() if l.startswith("STATE ")]
                 played, why = judge(game, states)
                 ok = "PASS compiles" in text and "FAIL" not in text and "THREW" not in text and played
-                print("%s %s seed %d: %d knobs moved; %s%s" % ("PASS" if ok else "FAIL", game, seed, len(remix.changed(gg)), why,
+                print("%s %s seed %d: %d changed%s; %s%s" % ("PASS" if ok else "FAIL", game, seed, len(remix.changed(gg)),
+                                                              " [%s]" % ", ".join(gg["mutated"]) if gg.get("mutated") else "", why,
                                                               "" if ok else "\n   " + text.strip()[-400:]))
                 fails += not ok
                 if real and seed == seeds[0] and os.path.exists(engine) and os.path.exists(player):

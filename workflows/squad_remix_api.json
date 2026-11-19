@@ -1,0 +1,102 @@
+{
+ "1": {
+  "class_type": "VC3D_RemixSource",
+  "inputs": {
+   "source": "Squad Buggy",
+   "seed": 1,
+   "dice": 1.0,
+   "title": "auto",
+   "name": "auto"
+  }
+ },
+ "2": {
+  "class_type": "VC3D_RemixBuggy",
+  "inputs": {
+   "gravity": 0.18,
+   "jump": 6.2,
+   "shot_speed": 22.0,
+   "dice": 0.7,
+   "game": [
+    "1",
+    0
+   ]
+  }
+ },
+ "3": {
+  "class_type": "VC3D_RemixTerrain",
+  "inputs": {
+   "segment": 20,
+   "crater_width": 52,
+   "crater_depth": 38,
+   "flag_gap": 2400,
+   "tower_gap": 1100,
+   "dice": 0.7,
+   "game": [
+    "2",
+    0
+   ]
+  }
+ },
+ "4": {
+  "class_type": "VC3D_RemixEnemies",
+  "inputs": {
+   "hold_steps": 600,
+   "sniper_range": 620,
+   "round_speed": 4.2,
+   "walker_gap": 1.0,
+   "walker_speed": 1.0,
+   "bomber_gap": 1.0,
+   "dice": 0.7,
+   "game": [
+    "3",
+    0
+   ]
+  }
+ },
+ "5": {
+  "class_type": "VC3D_RemixSquadPalette",
+  "inputs": {
+   "hue_shift": 0,
+   "spread": 0.15,
+   "buggy": "auto",
+   "enemies": "auto",
+   "ground": "auto",
+   "dice": 0.7,
+   "game": [
+    "4",
+    0
+   ]
+  }
+ },
+ "6": {
+  "class_type": "VC3D_RemixMutate",
+  "inputs": {
+   "chance": 0.6,
+   "most": 3,
+   "game": [
+    "5",
+    0
+   ]
+  }
+ },
+ "7": {
+  "class_type": "VC3D_BuildGame",
+  "inputs": {
+   "add_seed_to_name": true,
+   "save_to": "LIB_COMFY games (kept apart from LIB_GAMES)",
+   "game": [
+    "6",
+    0
+   ]
+  }
+ },
+ "8": {
+  "class_type": "PreviewImage",
+  "inputs": {
+   "images": [
+    "7",
+    1
+   ]
+  }
+ }
+}

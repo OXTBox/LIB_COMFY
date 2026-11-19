@@ -528,6 +528,73 @@ class RemixSource:
         return (remix.source(source, seed, dice, title, name),)
 
 
+def _remix_inputs(key, node, defaults):
+    out = []
+    for k in remix.GAMES[key]["knobs"]:
+        if k["node"] != node:
+            continue
+        v = max(k["lo"], min(k["hi"], defaults[k["name"]]))
+        if k["whole"]:
+            out.append((k["widget"], _int(int(v), k["lo"], k["hi"], 1, k["why"])))
+        else:
+            span = k["hi"] - k["lo"]
+            out.append((k["widget"], _float(float(v), k["lo"], k["hi"],
+                                            0.005 if span < 0.2 else 0.01 if span < 2 else 0.1, k["why"])))
+    return out + [("dice", _dice())]
+
+
+def _remix_node(cls_key, display, key, node, description, defaults):
+    def run(game, dice, **kw):
+        return remix.set_knobs(game, key, node, dice, **kw)
+    _node(cls_key, display, CAT_REMIX, description, _remix_inputs(key, node, defaults), run)
+
+
+_SQ = remix.slider_defaults(projects_root(), "squad")
+_TS = remix.slider_defaults(projects_root(), "toss")
+_remix_node("VC3D_RemixBuggy", "Buggy (Squad Buggy remix)", "squad", "buggy",
+            "Squad Buggy: gravity, the jump, your shots. The sliders start at the original's numbers.", _SQ)
+_remix_node("VC3D_RemixTerrain", "Terrain (Squad Buggy remix)", "squad", "terrain",
+            "Squad Buggy: the ground, the craters, how far apart flags and buildings stand.", _SQ)
+_remix_node("VC3D_RemixEnemies", "Enemies (Squad Buggy remix)", "squad", "enemies",
+            "Squad Buggy: snipers, flag holds, and how often and how fast walkers and bombers come "
+            "(a gap under 1 = more of them).", _SQ)
+_remix_node("VC3D_RemixArena", "Arena (Vector Toss remix)", "toss", "arena",
+            "Vector Toss: the box. Width and depth snap to whole tiles; the camera follows the size.", _TS)
+_remix_node("VC3D_RemixBall", "Ball (Vector Toss remix)", "toss", "ball",
+            "Vector Toss: the ball's size, gravity, bounce and how it rolls.", _TS)
+_remix_node("VC3D_RemixHeroes", "Heroes (Vector Toss remix)", "toss", "heroes",
+            "Vector Toss: PROMPT and GLAZE: run, jump, reach, throw power, the companion's patience.", _TS)
+_remix_node("VC3D_RemixRules", "Rules (Vector Toss remix)", "toss", "rules",
+            "Vector Toss: catches a level, hangs, falls.", _TS)
+
+
+def _hue():
+    return _int(0, -180, 180, 5, "turns every colour together (degrees round the colour wheel)")
+
+
+def _spread():
+    return _float(0.0, 0.0, 1.0, 0.05, "how far each colour may wander from the others (0 = they turn together)")
+
+
+_node("VC3D_RemixSquadPalette", "Palette (Squad Buggy remix)", CAT_REMIX,
+      "Squad Buggy's colours: turn them all, let them drift apart, or name the main three (#rrggbb).",
+      [("hue_shift", _hue()), ("spread", _spread()),
+       ("buggy", _color()), ("enemies", _color()), ("ground", _color()), ("dice", _dice())],
+      lambda game, hue_shift, spread, buggy, enemies, ground, dice: remix.set_palette(
+          game, "squad", hue_shift, spread, dice, cBuggy=buggy, cEnemy=enemies, cGround=ground))
+_node("VC3D_RemixTossPalette", "Palette (Vector Toss remix)", CAT_REMIX,
+      "Vector Toss's colours: PROMPT, GLAZE and the ball (auto = the original's, turned by hue_shift and dice).",
+      [("hue_shift", _hue()), ("spread", _spread()),
+       ("prompt", _color()), ("glaze", _color()), ("ball", _color()), ("dice", _dice())],
+      lambda game, hue_shift, spread, prompt, glaze, ball, dice: remix.set_palette(
+          game, "toss", hue_shift, spread, dice, kPromptColor=prompt, kGlazeColor=glaze, kBallColor=ball))
+_node("VC3D_RemixMutate", "Mutate (remix)", CAT_REMIX,
+      "Weird on purpose: by chance, pushes up to `most` numbers to the edge of their safe range and "
+      "names them in the title (LOW GRAVITY, SWARM, BIG BALL...). Put it last, before Build Game.",
+      [("chance", _float(0.6, 0.0, 1.0, 0.05, "how often a seed gets mutated (1 = every Queue)")),
+       ("most", _int(3, 1, 3, 1, "at most this many numbers go to the edge"))],
+      lambda game, chance, most: remix.mutate(game, chance, most))
+
 NODE_CLASS_MAPPINGS = {
     "VC3D_GameStart": GameStart,
     "VC3D_Palette": Palette,

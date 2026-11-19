@@ -120,46 +120,66 @@ the Game Browser. Read this before making more nodes or workflows.
 - Ideas next: event nodes across kits ("when a brick breaks -> sparks / sound / speed up"), a Title Card node, sound
   once `Sound.Play` has sounds in the Game Player.
 
-## Remix: Squad Buggy and Vector Toss (18 Nov 2026, Fable, job 4) -- STEP 1 DONE, waits for the owner's word
+## Remix: Squad Buggy and Vector Toss (18 Nov 2026, Fable, job 4) -- STEPS 1 AND 2 DONE, waits for the owner's Queue
 
 Branch `comfy-remix`. Brief: `Next_Steps_With_Claude/FABLE_JOB_4_COMFY_REMIX.md`. Both games are Engine 1
 (pure xTalk) game scripts; the originals in LIB_GAMES are read and never changed.
 
-- **What exists:** `kits/remix.py` (the knob tables, rolls, fix-ups, build, a bar preview) and one node,
-  **Remix Source** (`VC3D_RemixSource`, category Vibecode3D/Remix): which game, seed, master dice, title,
-  name. Chain: Remix Source -> Build Game. Build Game was reused as it is (`kits.build` sends kit
-  `remix` to `remix.build`); `preview.draw` sends it to `remix.preview_image`.
-- **A knob is a `constant kX = value` line.** Only the value is replaced, the comment stays. Defaults are
-  read from the game's file at every build, so if the owner retunes the original, dice 0 follows him.
-  A knob that is missing, or there twice, stops the build with a plain message.
+- **The chain:** Remix Source -> the game's nodes (any, in any order) -> Mutate -> Build Game. Build Game
+  was reused as it is (`kits.build` sends kit `remix` to `remix.build`; `preview.draw` to
+  `remix.preview_image`). Everything is in `kits/remix.py`; category Vibecode3D/Remix, 11 nodes:
+  Remix Source; Buggy, Terrain, Enemies, Palette (Squad Buggy); Arena, Ball, Heroes, Rules, Palette
+  (Vector Toss); Mutate. A node of the other game is left out with a note, it never breaks the Queue.
+- **Three kinds of knob** (tables at the top of remix.py):
+  - *constant*: a `constant kX = value` line; only the value is replaced, the comment stays. Defaults
+    are read from the game's file at every build, so dice 0 follows the owner's own retuning.
+  - *patch*: Squad Buggy's enemy pacing is numbers written into three lines, not constants
+    (`sNextEnemy`, `sESpeed`, `sNextFly`). `SQUAD_PATCHES` holds each exact line and its replacement:
+    the same sum times a factor. This is the answer to the owner's "we are unbeatable": walker_gap
+    0.3 = three times the walkers. If the original line changes, the build stops and says which.
+  - *colour*: Vector Toss has colour constants. Squad Buggy's are literals in the code:
+    `SQUAD_COLORS` maps literal -> role (buggy, flag, gunner, squad, ground, enemy, bomber, bomb,
+    tower) and the literal is replaced everywhere it stands, sparks too.
+- **Sliders start at the original's numbers**, read from the game files when ComfyUI starts (a typed
+  table, `FALLBACK`, only if the files can't be reached then). A saved workflow keeps the numbers it
+  was saved with.
 - **Rolls stay inside the safe range** (`roll_in`): dice 1 can reach either end and never passes it.
   `assemble.roll` was not used: it wanders by a share of the value, which throws ratios like kRollDrag
-  0.95 straight to their limits (the "dice on a ratio" trap above).
-- **Knobs:** Squad Buggy 11 (kGrav kJumpV kShotV kSeg kCraterR kCraterD kFlagGap kTowerGap kHoldSteps
-  kSnipeRange kRoundV), Vector Toss 23 (arena 4, ball 5, heroes 7, rules 4, colours 3). Each has its
-  node name in the table already (buggy / terrain / enemies; arena / ball / heroes / rules / palette),
-  ready for step 2. A knob no node has set is rolled with dice 0.5 (`FREE_DICE`) times the master dice.
-- **Fix-ups already in** (a Queue never gives a dead game): Squad Buggy's jump is kept between 85 and
-  300 high (craters stack to 70 deep; jump height = kJumpV^2 / (2 kGrav)). Vector Toss: the floor is whole
-  tiles (kHalfW, kHalfD snapped to kTile), a jump clears the level walls (32 high), kReach stays under
-  the ceiling, and kCamUp / kCamBack follow the arena's size (never rolled).
+  0.95 straight to their limits (the "dice on a ratio" trap above). A knob no node has set is rolled
+  around the original with dice 0.5 times the master dice.
+- **Mutate** (chance, most 1-3): by the seed, pushes numbers to the edge of their safe range and writes
+  them into the title: "SQUAD BUGGY: AIR RAID, LONG HOLDS, TOWER CITY", "VECTOR TOSS: SUDDEN DEATH,
+  DEAD BALL, FLOATY BALL". The words are in the knob tables (`low`, `high`); a knob without a word
+  is never mutated. It runs before the fix-ups, so a mutation can't make a dead game.
+- **Fix-ups** (notes say what changed): Squad Buggy: the jump 85..300 high (craters stack to 70 deep),
+  craters no wider than a jump can cross, sniper rounds no faster than 0.4 of your shots, sniper range
+  shorter than the gap between towers. Vector Toss: the floor is whole tiles, a jump clears the level
+  walls (32), reach under the ceiling, run speed enough to get under a roof throw in a big arena, catch
+  radius wider than a big ball, the camera follows the arena's size.
 - **Ranges that are narrow on purpose:** kSeg only 20..30 (Squad.Ground has a literal 24 slices behind
-  the buggy, so shorter segments would leave a gap on the right); kHalfW not under 240 (the level walls
-  stand up to 120 from the centre).
+  the buggy); kHalfW not under 240 (the level walls stand up to 120 from the centre).
 - **Data:** Vector Toss finds its clips and banter by fixed paths (`Game.FindFile("LIB_GAMES/...")`),
   not by its own name, so a renamed copy finds them. Nothing had to be pinned.
-- **Header:** line 2 gets the new card name and "(remixed in ComfyUI from <game>, seed N)"; a `## REMIX`
-  block before the closing line lists every changed constant (was -> now) and the fix-up notes.
-  The original's CONTROLS / RULES words are kept as they are, so "20 seconds" or "costs 3 points" can
-  be out of date in a variant: the REMIX block is the truth. (Step 2 could rewrite those words.)
-- **Tests:** `python3 -I tests/remix_play_test.py --real` : 10 seeds of each game compile and play 600
-  steps on the stand-ins (stubs + LIB_ig3d's alias file: without the aliases `Camera.Reset` is not
-  found). Squad Buggy drives, jumps and fires and gets forward; Vector Toss plays itself and makes 3-4
-  catches. Seed 1 of each also runs and draws in the Game Player on the generated engine. Dice 0 gives
-  the original's numbers; 10 seeds give 10 different games. The pack loads with ComfyUI's own Python
-  (32 nodes) and gives a `[1,600,900,3]` preview.
-- **Not done, not tested:** nothing is installed into ComfyUI yet (`tools/install.sh` is step 2), no
-  workflow files, nobody has played a variant. Squad Buggy's colours are literals, not constants:
-  its Palette needs the mapping table (step 2). The preview is bars, not a still of the game.
-- **Step 2 next (on his word):** the per-game nodes (they write into `g["k"]["remix"]["set"]`), Mutate,
-  the remaining fix-ups, the two stills, four workflow files, install, restart, Queue.
+- **Header:** line 2 gets the new card name, the title and "(remixed in ComfyUI from <game>, seed N)";
+  a `## REMIX` block lists every change (was -> now) and the notes. The original's CONTROLS / RULES
+  words are kept, so "20 seconds" can be out of date; the block says so.
+- **Stills:** Squad Buggy: the buggy, its jump as dots, a crater, a walker, a bomber, a tower, and
+  under it the course of one level (flags, towers, sniper range). Vector Toss: the arena from above
+  and from the side (a roof throw stepped as the game steps it), and the list of changes.
+  **Nobody has looked at them** (the images rule): the owner sees them first on the node.
+- **Workflows:** `workflows/squad_remix.json`, `toss_remix.json` (+ `_api.json`), written by
+  `tools/make_kit_workflows.py` from `kit_chains.remix_chain` (every node at its defaults, dice 0.7,
+  Mutate 0.6). `tools/queue.sh 1 5 squad_remix` queues five seeds.
+- **Tests:** `python3 -I tests/remix_play_test.py --real`: seeds compile and play 600 steps on the
+  stand-ins (stubs + LIB_ig3d's alias file: without it `Camera.Reset` is not found); even seeds use
+  the whole chain with Mutate always, odd seeds Remix Source alone. Run for seeds 1-50: 0 failed.
+  Squad Buggy drives, jumps and fires; Vector Toss plays itself and makes 3-5 catches. Seed 1 of each
+  runs and draws in the Game Player on the generated engine. Installed (`tools/install.sh`, both
+  installs), and both API workflows were run node by node from the installed pack with the install's
+  `.venv` python: 42 nodes, every widget default in range, `[1,600,900,3]` previews.
+- **Not tested:** ComfyUI was not running, so nothing was queued through it and the nodes were not
+  seen in its window. No person has played a variant: the autopilot proves a game runs, not that the
+  mutations are fun or fair (AIR RAID plus SWARM may be too much; that is what his notes are for).
+  The headless drive never gets stuck in a crater, so the crater fix-ups are sums, not play.
+- **Not built:** Squad Buggy's crew size (three soldiers is written through the code, not one number).
+  Step 3 (event nodes, more knobs) only on his word.

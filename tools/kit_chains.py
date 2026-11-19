@@ -117,3 +117,29 @@ def chain(kit, seed=1, small=False):
     steps[0][1]["seed"] = seed
     steps[1][1]["hue"] = (seed * 37) % 360
     return steps
+
+
+# ---------------------------------------------------------------- the remixes (Squad Buggy, Vector Toss)
+# Not kits of parts: Remix Source reads a whole game. The slider values are the originals' numbers,
+# read from the games' files by the nodes themselves (DEFAULTS = each node's own defaults).
+DEFAULTS = "defaults"
+REMIXES = {"squad": ("Squad Buggy", ["VC3D_RemixBuggy", "VC3D_RemixTerrain", "VC3D_RemixEnemies", "VC3D_RemixSquadPalette"]),
+           "toss": ("Vector Toss", ["VC3D_RemixArena", "VC3D_RemixBall", "VC3D_RemixHeroes", "VC3D_RemixRules",
+                                    "VC3D_RemixTossPalette"])}
+
+
+def remix_chain(vc, game, seed=1, dice=0.7, mutate=0.6):
+    """Remix Source, every node of the game at its defaults with this dice, then Mutate"""
+    label, keys = REMIXES[game]
+    steps = [("VC3D_RemixSource", {"source": label, "seed": seed, "dice": 1.0, "title": AUTO, "name": AUTO})]
+    for key in keys:
+        w = {}
+        for name, spec in vc.NODE_CLASS_MAPPINGS[key].INPUT_TYPES()["required"].items():
+            if name != "game":
+                w[name] = spec[1]["default"]
+        w["dice"] = dice
+        if "spread" in w:
+            w["spread"] = 0.15
+        steps.append((key, w))
+    steps.append(("VC3D_RemixMutate", {"chance": mutate, "most": 3}))
+    return steps
