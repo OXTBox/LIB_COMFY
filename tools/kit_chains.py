@@ -128,8 +128,18 @@ REMIXES = {"squad": ("Squad Buggy", ["VC3D_RemixBuggy", "VC3D_RemixTerrain", "VC
                                     "VC3D_RemixTossPalette"])}
 
 
-def remix_chain(vc, game, seed=1, dice=0.7, mutate=0.6):
-    """Remix Source, every node of the game at its defaults with this dice, then Mutate"""
+WHEN = {"squad": ("VC3D_RemixSquadWhen", [("bomber down", "sparks", 30), ("sniper down", "bomber comes", 1)]),
+        "toss": ("VC3D_RemixTossWhen", [("big catch", "sparks", 30), ("hero falls", "mend the floor", 1)])}
+
+
+def when(game, event, action, amount=20, chance=1.0, appear=1.0):
+    return (WHEN[game][0], {"event": event, "action": action, "amount": amount, "text": AUTO, "color": AUTO,
+                            "chance": chance, "appear": appear})
+
+
+def remix_chain(vc, game, seed=1, dice=0.7, mutate=0.6, rules=None):
+    """Remix Source, every node of the game at its defaults with this dice, two set When rules and
+    two the seed picks, then Mutate. rules: [(event, action, amount)] instead of those"""
     label, keys = REMIXES[game]
     steps = [("VC3D_RemixSource", {"source": label, "seed": seed, "dice": 1.0, "title": AUTO, "name": AUTO})]
     for key in keys:
@@ -141,5 +151,10 @@ def remix_chain(vc, game, seed=1, dice=0.7, mutate=0.6):
         if "spread" in w:
             w["spread"] = 0.15
         steps.append((key, w))
+    if rules is None:
+        steps += [when(game, *r) for r in WHEN[game][1]]
+        steps += [when(game, "random", "random", 20, 0.5, 0.7), when(game, "random", "random", 20, 0.5, 0.7)]
+    else:
+        steps += [when(game, *r) for r in rules]
     steps.append(("VC3D_RemixMutate", {"chance": mutate, "most": 3}))
     return steps

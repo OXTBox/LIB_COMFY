@@ -17,6 +17,8 @@ Nodes: Remix Source starts the chain (which game, seed, dice). The per-game node
 Enemies, Squad Palette; Arena, Toss Ball, Heroes, Toss Rules, Toss Palette) set their knobs from
 sliders, rolled by the seed inside the safe range. Knobs no node has set are rolled around the
 original. Mutate may push 1-3 knobs to the edge of their range and names them in the title.
+When nodes add rules ("when a bomber goes down: sparks", "when a catch: crack a tile"): see the
+events tables.
 Fix-ups then keep every seed a game that can be played.
 """
 import colorsys
@@ -94,13 +96,72 @@ TOSS_KNOBS = [
 ]
 TOSS_COLORS = [("kPromptColor", None), ("kGlazeColor", None), ("kBallColor", None)]
 
+# ------------------------------------------------------------ events: "when this happens, do that"
+# An event is a spot in the original: an exact line (there once) and where the call goes. The
+# call only QUEUES the event (Remix.On); the actions run at the top of the next Game.OnUpdate
+# (Remix.Flush), so an action never changes the game's lists while the game is looping over them.
+# (event: (words, [(anchor line, "after" | "before", the two values handed over)]))
+SQUAD_EVENTS = {
+    "bomber down": [('Squad.Say "BOMBER DOWN! +100"', "after", 'sShot[tS]["x"], sShot[tS]["h"]')],
+    "sniper down": [('Squad.Say "SNIPER DOWN! +75"', "after", 'sShot[tS]["x"], sShot[tS]["h"]')],
+    "walker shot": [('FX.Sparks Squad.SX(sEnemy[tK]["x"]), kBase - Squad.H(sEnemy[tK]["x"]) - 18, kZ, 8, "200,80,255"',
+                     "before", 'sEnemy[tK]["x"], Squad.H(sEnemy[tK]["x"]) + 18'),
+                    ('FX.Sparks Squad.SX(sEnemy[tT]["x"]), kBase - Squad.H(sEnemy[tT]["x"]) - 18, kZ, 8, "200,80,255"',
+                     "before", 'sEnemy[tT]["x"], Squad.H(sEnemy[tT]["x"]) + 18')],
+    "walker squashed": [('Squad.Say "SQUASHED!"', "after", "sX, sY")],
+    "man overboard": [('Squad.Say "MAN OVERBOARD! STOP BESIDE HIM"', "after", "sX, sY + 30")],
+    "soldier lost": [('Squad.Say "A SOLDIER IS LOST"', "after", "tEX, Squad.H(tEX)")],
+    "flag reached": [('Squad.Say "FLAG REACHED! HOLD IT FOR 20 SECONDS"', "after", "sX, sY + 60")],
+    "flag held": [("put tFX into sLastFlagX", "after", "tFX, Squad.H(tFX) + 40")],
+    "crater dug": [("put pX into sCrater[sCraterN]", "after", "pX, pH")],
+    "jump": [("put true into sJumped", "after", "sX, sY")],
+}
+# action: the lines it runs (tA, tB = the event's two values; %(n)s amount, %(text)s, %(rgb)s), amount's range
+SQUAD_ACTIONS = {
+    "sparks": (['FX.Sparks Squad.SX(tA), kBase - tB, kZ, %(n)s, "%(rgb)s"'], 4, 40),
+    "score": (["add %(n)s to sScore", "put empty into sHUDWas"], 1, 500),
+    "say": (['Squad.Say "%(text)s"'], 1, 1),
+    "extra life": (["if sLives < 9 then add 1 to sLives", "put empty into sHUDWas"], 1, 1),
+    "bomber comes": (["if the number of lines of the keys of sFly < 4 then Squad.AddFlyer sX - 520, sV + 2 + 0.3 * sLevel"], 1, 1),
+    "walkers faster": (["put min(6, sESpeed * (1 + %(n)s / 100)) into sESpeed"], 1, 50),
+    "walker rush": (["put 1 into sNextEnemy"], 1, 1),
+    "crater ahead": (["Squad.Blast sX + 260, Squad.H(sX + 260), true"], 1, 1),
+    "bounce": (["if sOver is not true then", "   put true into sAir", "   put max(sVY, kJumpV) into sVY", "end if"], 1, 1),
+}
+TOSS_EVENTS = {
+    "catch": [('add 1 to sHero[pName]["catches"]', "after", 'pName, empty')],
+    "big catch": [('VT.Say "catch_big", pName, 90', "after", 'pName, empty')],
+    "rally": [('VT.Say "rally", "*", 100', "after", '"*", empty')],
+    "drop": [("on VT.Drop pName", "after", 'pName, empty')],
+    "floor broke": [('VT.Message "THE FLOOR BROKE"', "after", '"*", empty')],
+    "pit took the ball": [('VT.Message "THE PIT TOOK THE BALL"', "after", 'tOwner, empty')],
+    "hero falls": [("on VT.StartFall pName", "after", 'pName, empty')],
+    "new level": [('VT.Message "LEVEL " & pLevel', "after", '"*", empty')],
+}
+# tA = the hero it happened to (PROMPT or GLAZE), or "*" for both
+TOSS_ACTIONS = {
+    "sparks": (['FX.Sparks sBall["x"], -sBall["h"], sBall["z"], %(n)s, "%(rgb)s"'], 4, 40),
+    "score": (['repeat for each item tH in "PROMPT,GLAZE"',
+               '   if tA is "*" or tA is tH then add %(n)s to sHero[tH]["score"]', "end repeat"], 1, 20),
+    "say": (['VT.Message "%(text)s"'], 1, 1),
+    "extra hang": (['repeat for each item tH in "PROMPT,GLAZE"',
+                    '   if (tA is "*" or tA is tH) and sHero[tH]["hangs"] < 5 then add 1 to sHero[tH]["hangs"]',
+                    "end repeat"], 1, 1),
+    "mend the floor": (["VT.MendFloor"], 1, 1),
+    "crack a tile": (["VT.HitTile random(2 * kHalfW) - kHalfW, random(2 * kHalfD) - kHalfD"], 1, 1),
+}
+SAY = {"squad": "NICE!", "toss": "BONUS!"}
+MAX_RULES = 8
+
 GAMES = {
     "squad": {"label": "Squad Buggy", "file": "Vibecode3D_Play_SquadBuggy.livecodescript",
               "name": "ComfySquad", "prefix": "Squad", "knobs": SQUAD_KNOBS, "patches": SQUAD_PATCHES,
-              "colors": SQUAD_COLORS, "derived": ("kSlices",)},
+              "colors": SQUAD_COLORS, "derived": ("kSlices",),
+              "events": SQUAD_EVENTS, "actions": SQUAD_ACTIONS, "spark": "cBomb"},
     "toss": {"label": "Vector Toss", "file": "Vibecode3D_Play_VectorToss.livecodescript",
              "name": "ComfyToss", "prefix": "VT", "knobs": TOSS_KNOBS, "patches": {},
-             "colors": TOSS_COLORS, "derived": ("kCamUp", "kCamBack")},
+             "colors": TOSS_COLORS, "derived": ("kCamUp", "kCamBack"),
+             "events": TOSS_EVENTS, "actions": TOSS_ACTIONS, "spark": "kBallColor"},
 }
 LABELS = tuple(v["label"] for v in GAMES.values())
 FREE_DICE = 0.5      # the dice of a knob no node has set
@@ -283,6 +344,99 @@ def mutate(game, chance, most):
     return g
 
 
+def when(game, key, event, action, amount, text, color, chance, appear):
+    """one rule: when `event` happens (each time, by `chance`), do `action`. 'random' = the seed picks."""
+    g, r = _mine(game, key, "When node")
+    if r is None:
+        return g
+    info = GAMES[key]
+    event = A.roll_choice(g, "we", event, sorted(info["events"]), 0)
+    action = A.roll_choice(g, "wa", action, sorted(info["actions"]), 0)
+    if not A.roll_chance(g, "wp", appear):
+        return g
+    rules = r.setdefault("events", [])
+    if len(rules) >= MAX_RULES:
+        g["notes"].append("more than %d When nodes: the rest are left out" % MAX_RULES)
+        return g
+    lo, hi = info["actions"][action][1:]
+    rules.append({"event": event, "action": action, "n": max(lo, min(hi, int(amount))),
+                  "text": text if text and text != "auto" else SAY[key],
+                  "color": color if A.hex_rgb(color or "") else None,
+                  "chance": max(0.01, min(1.0, float(chance)))})
+    return g
+
+
+def rule_words(e):
+    w = "when %s: %s" % (e["event"], e["action"])
+    if e["action"] in ("sparks", "score", "walkers faster"):
+        w += " %d" % e["n"]
+    if e["action"] == "say":
+        w += " '%s'" % e["text"]
+    if e["chance"] < 1:
+        w += " (%d%% of the time)" % round(e["chance"] * 100)
+    return w
+
+
+def add_event_calls(text, info, rules):
+    """the Remix.On calls at each used event's spot, and Remix.Flush at the top of Game.OnUpdate"""
+    lines = text.split("\n")
+
+    def spot(anchor):
+        hits = [i for i, l in enumerate(lines) if l.strip() == anchor]
+        if len(hits) != 1:
+            raise ValueError("remix: the event line is there %d times (1 expected): has the original changed?\n   %s"
+                             % (len(hits), anchor))
+        return hits[0]
+    for ev in sorted(set(e["event"] for e in rules)):
+        for anchor, where, args in info["events"][ev]:
+            i = spot(anchor)
+            pad = lines[i][:len(lines[i]) - len(lines[i].lstrip())]
+            if where == "after" and anchor.startswith("on "):
+                pad += "   "
+            lines.insert(i + (1 if where == "after" else 0), '%sRemix.On "%s", %s' % (pad, ev, args))
+    lines.insert(spot("on Game.OnUpdate") + 1, "   Remix.Flush")
+    return "\n".join(lines)
+
+
+def event_handlers(g, info, rules):
+    from .. import kits
+    v = g["k"]["vals"]
+    L = ["", "## REMIX events (generated by the Build node): what the When nodes asked for.",
+         "## Remix.On only notes an event; Remix.Flush acts on them at the top of the next step.",
+         "local sRemixQ, sRemixBusy", "",
+         "on Remix.On pEvent, pA, pB",
+         "   if sRemixBusy is true then exit Remix.On",
+         "   put pEvent & tab & pA & tab & pB & return after sRemixQ",
+         "end Remix.On", "",
+         "on Remix.Flush",
+         "   local tQ, tLine, tA, tB, tH",
+         "   if sRemixQ is empty then exit Remix.Flush",
+         "   put sRemixQ into tQ",
+         "   put empty into sRemixQ",
+         "   put true into sRemixBusy",
+         "   set the itemDelimiter to tab",
+         "   repeat for each line tLine in tQ",
+         "      put item 2 of tLine into tA",
+         "      put item 3 of tLine into tB",
+         "      put item 1 of tLine into tH",
+         "      set the itemDelimiter to comma",
+         "      switch tH"]
+    for ev in sorted(set(e["event"] for e in rules)):
+        L.append('         case "%s"' % ev)
+        for e in rules:
+            if e["event"] != ev:
+                continue
+            vals = {"n": e["n"], "text": kits.hud_safe(e["text"])[:40],
+                    "rgb": "%d,%d,%d" % A.hex_rgb(e["color"] or v[info["spark"]])}
+            L.append("            if random(100) <= %d then" % round(e["chance"] * 100))
+            L += ["               " + a % vals for a in info["actions"][e["action"]][0]]
+            L.append("            end if")
+        L.append("            break")
+    L += ["      end switch", "      set the itemDelimiter to tab", "   end repeat",
+          "   set the itemDelimiter to comma", "   put false into sRemixBusy", "end Remix.Flush", ""]
+    return "\n".join(L)
+
+
 # ------------------------------------------------------------ fix-ups
 def fixups(game, defaults):
     """a copy with g["k"]["vals"] (every knob's value for this seed) and g["k"]["defaults"]"""
@@ -398,6 +552,8 @@ def header_lines(g, info):
         row += bit
     if row.strip("# "):
         L.append(row.rstrip(";"))
+    for e in g["k"]["remix"].get("events") or []:
+        L.append("##           " + rule_words(e))
     L.append("##           (the CONTROLS and RULES words above are the original's: its numbers may differ here)")
     for note in g["notes"]:
         L.append("##           note: " + note)
@@ -414,6 +570,9 @@ def build(game, projects_root, out_dir, name):
     g = fixups(game, defaults)
     for n in info["derived"]:
         g["k"]["defaults"][n] = defaults.get(n)
+    rules = g["k"]["remix"].get("events") or []
+    if rules:                               # first: the spots are found by the original's own lines
+        text = add_event_calls(text, info, rules)
     literal = dict(info["colors"])
     for n, v in g["k"]["vals"].items():
         if n in info["patches"]:
@@ -432,6 +591,8 @@ def build(game, projects_root, out_dir, name):
     end = next(i for i in range(2, len(lines)) if lines[i].startswith("#####"))
     lines[end:end] = header_lines(g, info)
     script = "\n".join(lines)
+    if rules:
+        script = script.rstrip("\n") + "\n" + event_handlers(g, info, rules)
     if out_dir is None:
         out_dir = os.path.join(projects_root, "LIB_COMFY", "games")
     os.makedirs(out_dir, exist_ok=True)
@@ -453,6 +614,9 @@ def preview_image(g, im, d):
     d.text((20, 12), "%s   seed %s   %s" % (g["title"].upper(), g["seed"], g.get("file_name", "")), fill=head)
     d.text((20, 30), "remix of %s: %d numbers changed" % (GAMES[key]["label"], len(changed(g))), fill=(120, 130, 140))
     (still_squad if key == "squad" else still_toss)(g, d, v, col, W, H)
+    rules = g["k"]["remix"].get("events") or []
+    for i, e in enumerate(rules[:4]):
+        d.text((470, 12 + 15 * i), rule_words(e), fill=(120, 255, 160))
     for i, note in enumerate(g["notes"][:3]):
         d.text((20, H - 18 - 15 * i), note, fill=(255, 200, 80))
     return im

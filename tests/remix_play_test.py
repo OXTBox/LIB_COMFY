@@ -23,7 +23,8 @@ LABEL = {"squad": "Squad Buggy", "toss": "Vector Toss"}
 PREFIX = {"squad": "Squad", "toss": "VT"}
 
 
-def body(game, script, stubs, aliases):
+def body(game, script, stubs, aliases, fire=()):
+    """fire: event names set off by hand after the play, each followed by a step"""
     b = ["local tS, tSt, i",
          'put textDecode(url ("binfile:%s"), "UTF-8") into tSt' % stubs, "delete line 1 of tSt",
          'put tSt & return & textDecode(url ("binfile:%s"), "UTF-8") into tSt' % aliases,
@@ -50,6 +51,11 @@ def body(game, script, stubs, aliases):
               "   repeat with i = 1 to 600", '      dispatch "Game.OnUpdate" to tS',
               '      if i mod 300 is 0 then put "STATE " & value("VT.State()", tS) & return after tLog',
               "   end repeat"]
+    for ev in fire:
+        args = '500, 90' if game == "squad" else '"PROMPT", empty'
+        b += ['   dispatch "Remix.On" to tS with "%s", %s' % (ev, args), '   dispatch "Game.OnUpdate" to tS']
+    if fire:
+        b += ['   put "FIRED %d" & return after tLog' % len(fire)]
     b += ["catch tE", '   put "FAIL threw: " & line 1 to 3 of tE & return after tLog', "end try", "return tLog"]
     return "\n".join(b)
 
@@ -99,6 +105,37 @@ def main(argv):
             ok = not remix.changed(gg)
             print("%s %s dice 0: the original's numbers (%s)" % ("PASS" if ok else "FAIL", game, remix.changed(gg) or "none changed"))
             fails += not ok
+            # a rule must really go off: points for every jump / every catch
+            rule = {"squad": ("jump", "score", 500), "toss": ("catch", "score", 20)}[game]
+            got = {}
+            for name, rules in (("plain", []), ("rule", [rule])):
+                g = kit_test.run_chain(vc, kit_chains.remix_chain(vc, game, 1, 0.0, 0.0, rules))
+                path, _, gg = vc.assemble.build(g, projects, tmp, "Rule" + name)
+                text = kp.run_body(projects, body(game, path, stubs, aliases), tmp, "%s_rule_%s" % (game, name))
+                st = [l[6:] for l in text.splitlines() if l.startswith("STATE ")]
+                f = st[-1].split("|") if st and "FAIL" not in text else []
+                got[name] = (int(f[2]) if game == "squad" else int(f[1].split(",")[0]) + int(f[2].split(",")[0])) if f else None
+            ok = None not in got.values() and got["rule"] >= got["plain"] + rule[2] * 2
+            print("%s %s When %s -> %s %d: score %s without, %s with" % ("PASS" if ok else "FAIL", game, rule[0], rule[1],
+                                                                         rule[2], got["plain"], got["rule"]))
+            fails += not ok
+            # every event with every action, set off by hand (the autopilot never downs a bomber)
+            info = remix.GAMES[game]
+            evs, acts = sorted(info["events"]), sorted(info["actions"])
+            pairs = [(e, a, 20) for e in evs for a in acts]
+            ok, n = True, 0
+            for at in range(0, len(pairs), remix.MAX_RULES):
+                chunk = pairs[at:at + remix.MAX_RULES]
+                g = kit_test.run_chain(vc, kit_chains.remix_chain(vc, game, 1, 0.0, 0.0, chunk))
+                path, _, gg = vc.assemble.build(g, projects, tmp, "Every%d" % at)
+                fire = sorted(set(e for e, _, _ in chunk))
+                text = kp.run_body(projects, body(game, path, stubs, aliases, fire), tmp, "%s_every_%d" % (game, at))
+                if "PASS compiles" not in text or "FAIL" in text or "FIRED" not in text:
+                    ok = False
+                    print("   " + text.strip()[-300:] + "\n   rules: %s" % chunk)
+                n += len(chunk)
+            print("%s %s: every event with every action goes off without an error (%d pairs)" % ("PASS" if ok else "FAIL", game, n))
+            fails += not ok
             seen = set()
             for seed in seeds:
                 # even seeds: the whole chain (every node, Mutate always); odd seeds: Remix Source alone
@@ -113,7 +150,8 @@ def main(argv):
                 played, why = judge(game, states)
                 ok = "PASS compiles" in text and "FAIL" not in text and "THREW" not in text and played
                 print("%s %s seed %d: %d changed%s; %s%s" % ("PASS" if ok else "FAIL", game, seed, len(remix.changed(gg)),
-                                                              " [%s]" % ", ".join(gg["mutated"]) if gg.get("mutated") else "", why,
+                                                              (" [%s]" % ", ".join(gg["mutated"]) if gg.get("mutated") else "")
+                                                              + "".join(" {%s}" % remix.rule_words(e) for e in gg["k"]["remix"].get("events") or []), why,
                                                               "" if ok else "\n   " + text.strip()[-400:]))
                 fails += not ok
                 if real and seed == seeds[0] and os.path.exists(engine) and os.path.exists(player):

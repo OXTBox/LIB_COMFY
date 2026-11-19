@@ -65,7 +65,10 @@ any of the game's nodes: **Buggy**, **Terrain**, **Enemies**, **Palette** for Sq
 **Heroes**, **Rules**, **Palette** for Vector Toss. Their sliders start at the original's numbers and
 can't leave a safe range; dice lets the seed move them. A number no node sets is rolled around the
 original. **Mutate** pushes up to three numbers to the edge and names them in the title
-("SQUAD BUGGY: AIR RAID, TOWER CITY"). Dice 0 and no Mutate = the original game.
+("SQUAD BUGGY: AIR RAID, TOWER CITY"). **When** nodes add rules, several in a chain: an event (bomber
+down, sniper down, flag held, jump...; catch, drop, floor broke, hero falls...) sets off an action
+(sparks, score, say, a bomber comes, crater ahead, bounce...; extra hang, mend the floor, crack a
+tile). `random` lets the seed pick. Dice 0, no Mutate, no When = the original game.
 
 ## Adding a kind of part
 

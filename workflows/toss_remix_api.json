@@ -85,10 +85,15 @@
   }
  },
  "7": {
-  "class_type": "VC3D_RemixMutate",
+  "class_type": "VC3D_RemixTossWhen",
   "inputs": {
-   "chance": 0.6,
-   "most": 3,
+   "event": "big catch",
+   "action": "sparks",
+   "amount": 30,
+   "text": "auto",
+   "color": "auto",
+   "chance": 1.0,
+   "appear": 1.0,
    "game": [
     "6",
     0
@@ -96,10 +101,15 @@
   }
  },
  "8": {
-  "class_type": "VC3D_BuildGame",
+  "class_type": "VC3D_RemixTossWhen",
   "inputs": {
-   "add_seed_to_name": true,
-   "save_to": "LIB_COMFY games (kept apart from LIB_GAMES)",
+   "event": "hero falls",
+   "action": "mend the floor",
+   "amount": 1,
+   "text": "auto",
+   "color": "auto",
+   "chance": 1.0,
+   "appear": 1.0,
    "game": [
     "7",
     0
@@ -107,10 +117,64 @@
   }
  },
  "9": {
+  "class_type": "VC3D_RemixTossWhen",
+  "inputs": {
+   "event": "random",
+   "action": "random",
+   "amount": 20,
+   "text": "auto",
+   "color": "auto",
+   "chance": 0.5,
+   "appear": 0.7,
+   "game": [
+    "8",
+    0
+   ]
+  }
+ },
+ "10": {
+  "class_type": "VC3D_RemixTossWhen",
+  "inputs": {
+   "event": "random",
+   "action": "random",
+   "amount": 20,
+   "text": "auto",
+   "color": "auto",
+   "chance": 0.5,
+   "appear": 0.7,
+   "game": [
+    "9",
+    0
+   ]
+  }
+ },
+ "11": {
+  "class_type": "VC3D_RemixMutate",
+  "inputs": {
+   "chance": 0.6,
+   "most": 3,
+   "game": [
+    "10",
+    0
+   ]
+  }
+ },
+ "12": {
+  "class_type": "VC3D_BuildGame",
+  "inputs": {
+   "add_seed_to_name": true,
+   "save_to": "LIB_COMFY games (kept apart from LIB_GAMES)",
+   "game": [
+    "11",
+    0
+   ]
+  }
+ },
+ "13": {
   "class_type": "PreviewImage",
   "inputs": {
    "images": [
-    "8",
+    "12",
     1
    ]
   }

@@ -120,7 +120,7 @@ the Game Browser. Read this before making more nodes or workflows.
 - Ideas next: event nodes across kits ("when a brick breaks -> sparks / sound / speed up"), a Title Card node, sound
   once `Sound.Play` has sounds in the Game Player.
 
-## Remix: Squad Buggy and Vector Toss (18 Nov 2026, Fable, job 4) -- STEPS 1 AND 2 DONE, waits for the owner's Queue
+## Remix: Squad Buggy and Vector Toss (18 Nov 2026, Fable, job 4) -- STEPS 1, 2 AND 3 DONE, waits for the owner's Queue
 
 Branch `comfy-remix`. Brief: `Next_Steps_With_Claude/FABLE_JOB_4_COMFY_REMIX.md`. Both games are Engine 1
 (pure xTalk) game scripts; the originals in LIB_GAMES are read and never changed.
@@ -182,4 +182,37 @@ Branch `comfy-remix`. Brief: `Next_Steps_With_Claude/FABLE_JOB_4_COMFY_REMIX.md`
   mutations are fun or fair (AIR RAID plus SWARM may be too much; that is what his notes are for).
   The headless drive never gets stuck in a crater, so the crater fix-ups are sums, not play.
 - **Not built:** Squad Buggy's crew size (three soldiers is written through the code, not one number).
-  Step 3 (event nodes, more knobs) only on his word.
+
+### Step 3: the When nodes (events), same night
+
+- **Two nodes:** When (Squad Buggy remix), When (Vector Toss remix): event, action, amount, text,
+  color, chance (each time it happens), appear (is the rule in this seed's game). Chain several, at
+  most 8 (`MAX_RULES`). `random` for event or action lets the seed pick: that is where the odd ones
+  come from ("when a flag is held: crater ahead").
+- **Squad Buggy events:** bomber down, sniper down, walker shot, walker squashed, man overboard,
+  soldier lost, flag reached, flag held, crater dug, jump. **Actions:** sparks, score, say, extra life,
+  bomber comes, walkers faster, walker rush, crater ahead, bounce.
+- **Vector Toss events:** catch, big catch, rally, drop, floor broke, pit took the ball, hero falls,
+  new level. **Actions:** sparks, score, say, extra hang, mend the floor, crack a tile.
+- **How an event is found:** by one exact line of the original (`SQUAD_EVENTS`, `TOSS_EVENTS`: the
+  line, before or after, the two values handed over). Build puts `Remix.On "<event>", a, b` there,
+  only for events a rule uses, and `Remix.Flush` as the first line of `Game.OnUpdate`. The spots are
+  looked up BEFORE the colours are replaced (two anchors hold a colour literal). A line that is gone
+  or there twice stops the build and names it.
+- **Why a queue:** `Remix.On` only writes the event down; `Remix.Flush` runs the actions at the top of
+  the next step. Most events sit inside the game's own `repeat for each key` loops over walkers,
+  bombs and shots; an action that kills walkers there (a crater) would pull the list out from under
+  the loop. One step late can't be seen. Events raised while Flush runs are dropped (`sRemixBusy`),
+  so "when a crater is dug: crater ahead" makes one crater, not one every step for ever.
+- **Vector Toss trap:** `VT.Advance` (roof, wall and floor bounces) is also run for the ghost ball
+  and the companion's planning, so a hook there would fire on throws nobody made. No roof / wall
+  events for that reason; they need a flag saying "this is the real ball" in the original first.
+- **Adding an event or an action:** one line in the table. An action's lines may use tA, tB (the
+  event's values; Vector Toss: tA = the hero, or "*") and %(n)s, %(text)s, %(rgb)s.
+- **Tests added to `remix_play_test.py`:** a rule really goes off (Squad Buggy: 500 points a jump took
+  the score from 545 to 4065; Vector Toss: 20 a catch, 6 to 87); every event with every action (90
+  pairs, 48 pairs) is built, compiled and set off by hand without an error; seeds 1-50 with two set
+  rules and two random ones on even seeds: 0 failed. Installed; both API workflows run from the
+  installed pack (44 nodes).
+- **Not tested:** the actions on the real engine with a person playing (the stand-ins' FX.Sparks draws
+  nothing); whether a rule is fun. ComfyUI was still not running.

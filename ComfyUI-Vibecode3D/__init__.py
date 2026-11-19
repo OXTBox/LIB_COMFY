@@ -588,6 +588,28 @@ _node("VC3D_RemixTossPalette", "Palette (Vector Toss remix)", CAT_REMIX,
        ("prompt", _color()), ("glaze", _color()), ("ball", _color()), ("dice", _dice())],
       lambda game, hue_shift, spread, prompt, glaze, ball, dice: remix.set_palette(
           game, "toss", hue_shift, spread, dice, kPromptColor=prompt, kGlazeColor=glaze, kBallColor=ball))
+def _when_node(cls_key, display, key, description):
+    info = remix.GAMES[key]
+    _node(cls_key, display, CAT_REMIX, description,
+          [("event", _pick(["random"] + sorted(info["events"]), sorted(info["events"])[0],
+                           "what has to happen (random = the seed picks)")),
+           ("action", _pick(["random"] + sorted(info["actions"]), "sparks", "what it sets off (random = the seed picks)")),
+           ("amount", _int(20, 1, 500, 1, "how many sparks, how many points, how many percent faster")),
+           ("text", ("STRING", {"default": "auto", "tooltip": "the words for the action 'say'"})),
+           ("color", _color()),
+           ("chance", _float(1.0, 0.05, 1.0, 0.05, "how often it goes off when the event happens (1 = every time)")),
+           ("appear", _chance())],
+          lambda game, event, action, amount, text, color, chance, appear: remix.when(
+              game, key, event, action, amount, text, color, chance, appear))
+
+
+_when_node("VC3D_RemixSquadWhen", "When (Squad Buggy remix)", "squad",
+           "Squad Buggy: when something happens, set something off (chain several). "
+           "When a sniper goes down: a bomber comes. When you jump: sparks.")
+_when_node("VC3D_RemixTossWhen", "When (Vector Toss remix)", "toss",
+           "Vector Toss: when something happens, set something off (chain several). "
+           "When a catch: crack a tile. When a hero falls: mend the floor.")
+
 _node("VC3D_RemixMutate", "Mutate (remix)", CAT_REMIX,
       "Weird on purpose: by chance, pushes up to `most` numbers to the edge of their safe range and "
       "names them in the title (LOW GRAVITY, SWARM, BIG BALL...). Put it last, before Build Game.",

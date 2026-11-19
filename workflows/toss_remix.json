@@ -1,6 +1,6 @@
 {
- "last_node_id": 9,
- "last_link_id": 8,
+ "last_node_id": 13,
+ "last_link_id": 12,
  "nodes": [
   {
    "id": 1,
@@ -256,7 +256,7 @@
   },
   {
    "id": 7,
-   "type": "VC3D_RemixMutate",
+   "type": "VC3D_RemixTossWhen",
    "pos": [
     370,
     500
@@ -286,16 +286,21 @@
     }
    ],
    "properties": {
-    "Node name for S&R": "VC3D_RemixMutate"
+    "Node name for S&R": "VC3D_RemixTossWhen"
    },
    "widgets_values": [
-    0.6,
-    3
+    "big catch",
+    "sparks",
+    30,
+    "auto",
+    "auto",
+    1.0,
+    1.0
    ]
   },
   {
    "id": 8,
-   "type": "VC3D_BuildGame",
+   "type": "VC3D_RemixTossWhen",
    "pos": [
     700,
     500
@@ -316,6 +321,177 @@
    ],
    "outputs": [
     {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "links": [
+      8
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VC3D_RemixTossWhen"
+   },
+   "widgets_values": [
+    "hero falls",
+    "mend the floor",
+    1,
+    "auto",
+    "auto",
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "id": 9,
+   "type": "VC3D_RemixTossWhen",
+   "pos": [
+    1030,
+    500
+   ],
+   "size": [
+    300,
+    320
+   ],
+   "flags": {},
+   "order": 8,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "link": 8
+    }
+   ],
+   "outputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "links": [
+      9
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VC3D_RemixTossWhen"
+   },
+   "widgets_values": [
+    "random",
+    "random",
+    20,
+    "auto",
+    "auto",
+    0.5,
+    0.7
+   ]
+  },
+  {
+   "id": 10,
+   "type": "VC3D_RemixTossWhen",
+   "pos": [
+    1360,
+    500
+   ],
+   "size": [
+    300,
+    320
+   ],
+   "flags": {},
+   "order": 9,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "link": 9
+    }
+   ],
+   "outputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "links": [
+      10
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VC3D_RemixTossWhen"
+   },
+   "widgets_values": [
+    "random",
+    "random",
+    20,
+    "auto",
+    "auto",
+    0.5,
+    0.7
+   ]
+  },
+  {
+   "id": 11,
+   "type": "VC3D_RemixMutate",
+   "pos": [
+    40,
+    940
+   ],
+   "size": [
+    300,
+    320
+   ],
+   "flags": {},
+   "order": 10,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "link": 10
+    }
+   ],
+   "outputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "links": [
+      11
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VC3D_RemixMutate"
+   },
+   "widgets_values": [
+    0.6,
+    3
+   ]
+  },
+  {
+   "id": 12,
+   "type": "VC3D_BuildGame",
+   "pos": [
+    370,
+    940
+   ],
+   "size": [
+    300,
+    320
+   ],
+   "flags": {},
+   "order": 11,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "link": 11
+    }
+   ],
+   "outputs": [
+    {
      "name": "script_path",
      "type": "STRING",
      "links": null,
@@ -325,7 +501,7 @@
      "name": "preview",
      "type": "IMAGE",
      "links": [
-      8
+      12
      ],
      "slot_index": 1
     },
@@ -345,24 +521,24 @@
    ]
   },
   {
-   "id": 9,
+   "id": 13,
    "type": "PreviewImage",
    "pos": [
     370,
-    940
+    1380
    ],
    "size": [
     620,
     440
    ],
    "flags": {},
-   "order": 8,
+   "order": 12,
    "mode": 0,
    "inputs": [
     {
      "name": "images",
      "type": "IMAGE",
-     "link": 8
+     "link": 12
     }
    ],
    "outputs": [],
@@ -432,8 +608,40 @@
   [
    8,
    8,
-   1,
+   0,
    9,
+   0,
+   "VC3D_GAME"
+  ],
+  [
+   9,
+   9,
+   0,
+   10,
+   0,
+   "VC3D_GAME"
+  ],
+  [
+   10,
+   10,
+   0,
+   11,
+   0,
+   "VC3D_GAME"
+  ],
+  [
+   11,
+   11,
+   0,
+   12,
+   0,
+   "VC3D_GAME"
+  ],
+  [
+   12,
+   12,
+   1,
+   13,
    0,
    "IMAGE"
   ]

@@ -1,6 +1,6 @@
 {
- "last_node_id": 8,
- "last_link_id": 7,
+ "last_node_id": 12,
+ "last_link_id": 11,
  "nodes": [
   {
    "id": 1,
@@ -212,7 +212,7 @@
   },
   {
    "id": 6,
-   "type": "VC3D_RemixMutate",
+   "type": "VC3D_RemixSquadWhen",
    "pos": [
     40,
     500
@@ -242,16 +242,21 @@
     }
    ],
    "properties": {
-    "Node name for S&R": "VC3D_RemixMutate"
+    "Node name for S&R": "VC3D_RemixSquadWhen"
    },
    "widgets_values": [
-    0.6,
-    3
+    "bomber down",
+    "sparks",
+    30,
+    "auto",
+    "auto",
+    1.0,
+    1.0
    ]
   },
   {
    "id": 7,
-   "type": "VC3D_BuildGame",
+   "type": "VC3D_RemixSquadWhen",
    "pos": [
     370,
     500
@@ -272,6 +277,177 @@
    ],
    "outputs": [
     {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "links": [
+      7
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VC3D_RemixSquadWhen"
+   },
+   "widgets_values": [
+    "sniper down",
+    "bomber comes",
+    1,
+    "auto",
+    "auto",
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "id": 8,
+   "type": "VC3D_RemixSquadWhen",
+   "pos": [
+    700,
+    500
+   ],
+   "size": [
+    300,
+    320
+   ],
+   "flags": {},
+   "order": 7,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "link": 7
+    }
+   ],
+   "outputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "links": [
+      8
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VC3D_RemixSquadWhen"
+   },
+   "widgets_values": [
+    "random",
+    "random",
+    20,
+    "auto",
+    "auto",
+    0.5,
+    0.7
+   ]
+  },
+  {
+   "id": 9,
+   "type": "VC3D_RemixSquadWhen",
+   "pos": [
+    1030,
+    500
+   ],
+   "size": [
+    300,
+    320
+   ],
+   "flags": {},
+   "order": 8,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "link": 8
+    }
+   ],
+   "outputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "links": [
+      9
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VC3D_RemixSquadWhen"
+   },
+   "widgets_values": [
+    "random",
+    "random",
+    20,
+    "auto",
+    "auto",
+    0.5,
+    0.7
+   ]
+  },
+  {
+   "id": 10,
+   "type": "VC3D_RemixMutate",
+   "pos": [
+    1360,
+    500
+   ],
+   "size": [
+    300,
+    320
+   ],
+   "flags": {},
+   "order": 9,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "link": 9
+    }
+   ],
+   "outputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "links": [
+      10
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VC3D_RemixMutate"
+   },
+   "widgets_values": [
+    0.6,
+    3
+   ]
+  },
+  {
+   "id": 11,
+   "type": "VC3D_BuildGame",
+   "pos": [
+    40,
+    940
+   ],
+   "size": [
+    300,
+    320
+   ],
+   "flags": {},
+   "order": 10,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "link": 10
+    }
+   ],
+   "outputs": [
+    {
      "name": "script_path",
      "type": "STRING",
      "links": null,
@@ -281,7 +457,7 @@
      "name": "preview",
      "type": "IMAGE",
      "links": [
-      7
+      11
      ],
      "slot_index": 1
     },
@@ -301,24 +477,24 @@
    ]
   },
   {
-   "id": 8,
+   "id": 12,
    "type": "PreviewImage",
    "pos": [
     370,
-    940
+    1380
    ],
    "size": [
     620,
     440
    ],
    "flags": {},
-   "order": 7,
+   "order": 11,
    "mode": 0,
    "inputs": [
     {
      "name": "images",
      "type": "IMAGE",
-     "link": 7
+     "link": 11
     }
    ],
    "outputs": [],
@@ -380,8 +556,40 @@
   [
    7,
    7,
-   1,
+   0,
    8,
+   0,
+   "VC3D_GAME"
+  ],
+  [
+   8,
+   8,
+   0,
+   9,
+   0,
+   "VC3D_GAME"
+  ],
+  [
+   9,
+   9,
+   0,
+   10,
+   0,
+   "VC3D_GAME"
+  ],
+  [
+   10,
+   10,
+   0,
+   11,
+   0,
+   "VC3D_GAME"
+  ],
+  [
+   11,
+   11,
+   1,
+   12,
    0,
    "IMAGE"
   ]
