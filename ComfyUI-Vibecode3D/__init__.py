@@ -500,6 +500,34 @@ _node("VC3D_RockRules", "Rock Rules (Vibecode3D)", CAT_ROCK,
        ("extra_ship_every", _int(10000, 0, 50000, 500)), ("dice", _dice())],
       lambda game, **k: rocks.rules(game, **k))
 
+# ---------------------------------------------------------------- remix: variants of whole games
+from .kits import remix  # noqa: E402
+
+CAT_REMIX = "Vibecode3D/Remix"
+
+
+class RemixSource:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {"required": {
+            "source": (list(remix.LABELS), {"tooltip": "the hand-made game to remix (it is read, never changed)"}),
+            "seed": ("INT", {"default": 1, "min": 0, "max": 2 ** 31 - 1, "control_after_generate": True}),
+            "dice": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1.0, "step": 0.05,
+                               "tooltip": "master dice: 0 = the original game, 1 = the seed moves every knob"}),
+            "title": ("STRING", {"default": "auto", "tooltip": "auto = <game> Remix"}),
+            "name": ("STRING", {"default": "auto", "tooltip": "file name; auto = ComfySquad / ComfyToss"}),
+        }}
+    RETURN_TYPES = GAME
+    RETURN_NAMES = ("game",)
+    FUNCTION = "run"
+    CATEGORY = CAT_REMIX
+    DESCRIPTION = ("Starts a remix chain: Build Game writes a copy of Squad Buggy or Vector Toss with its "
+                   "numbers moved by the seed, inside safe ranges.")
+
+    def run(self, source, seed, dice, title, name):
+        return (remix.source(source, seed, dice, title, name),)
+
+
 NODE_CLASS_MAPPINGS = {
     "VC3D_GameStart": GameStart,
     "VC3D_Palette": Palette,
@@ -508,6 +536,7 @@ NODE_CLASS_MAPPINGS = {
     "VC3D_Ball": Ball,
     "VC3D_MatchRules": MatchRules,
     "VC3D_BuildGame": BuildGame,
+    "VC3D_RemixSource": RemixSource,
 }
 NODE_DISPLAY_NAME_MAPPINGS = {
     "VC3D_GameStart": "Game Start (Vibecode3D)",
@@ -517,6 +546,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VC3D_Ball": "Ball (Vibecode3D)",
     "VC3D_MatchRules": "Match Rules (Vibecode3D)",
     "VC3D_BuildGame": "Build Game (Vibecode3D)",
+    "VC3D_RemixSource": "Remix Source (Vibecode3D)",
 }
 for _key, _display, _cls in _GENRE_NODES:
     NODE_CLASS_MAPPINGS[_key] = _cls

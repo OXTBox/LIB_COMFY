@@ -10,6 +10,9 @@ def draw(g):
     from PIL import Image, ImageDraw
     im = Image.new("RGB", (W, H), (0, 0, 0))
     d = ImageDraw.Draw(im)
+    if g.get("kit") == "remix":
+        from .kits import remix
+        return remix.preview_image(g, im, d)
     if g.get("kit", "cpong") != "cpong":
         return _draw_kit(g, im, d)
     c = g["court"]

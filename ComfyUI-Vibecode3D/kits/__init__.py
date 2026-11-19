@@ -10,11 +10,12 @@
   preview(g, d, P) draws a still frame with PIL (d an ImageDraw, P(x, y) a screen point)
 
 Pong (cpong) stays in assemble.py as it was; build() there sends every other kit here.
+remix.py is not a kit of parts: it rewrites the constants of a whole hand-made game (see its top).
 """
 import os
 import re
 
-from . import brick, coil, dodge, lander, rocks, wave  # noqa: E402
+from . import brick, coil, dodge, lander, remix, rocks, wave  # noqa: E402
 
 KITS = {m.KIT: m for m in (brick, wave, coil, dodge, lander, rocks)}
 
@@ -71,6 +72,8 @@ def header(kit, g, name, parts):
 
 
 def build(game, projects_root, out_dir, name):
+    if game["kit"] == remix.KIT:
+        return remix.build(game, projects_root, out_dir, name)
     kit = KITS[game["kit"]]
     g = kit.fixups(game)
     parts = kit.parts_needed(g)

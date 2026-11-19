@@ -119,3 +119,47 @@ the Game Browser. Read this before making more nodes or workflows.
   steps aside from bombs. `tests/kit_play_test.py --seed N` was run for seeds 1 to 10.
 - Ideas next: event nodes across kits ("when a brick breaks -> sparks / sound / speed up"), a Title Card node, sound
   once `Sound.Play` has sounds in the Game Player.
+
+## Remix: Squad Buggy and Vector Toss (18 Nov 2026, Fable, job 4) -- STEP 1 DONE, waits for the owner's word
+
+Branch `comfy-remix`. Brief: `Next_Steps_With_Claude/FABLE_JOB_4_COMFY_REMIX.md`. Both games are Engine 1
+(pure xTalk) game scripts; the originals in LIB_GAMES are read and never changed.
+
+- **What exists:** `kits/remix.py` (the knob tables, rolls, fix-ups, build, a bar preview) and one node,
+  **Remix Source** (`VC3D_RemixSource`, category Vibecode3D/Remix): which game, seed, master dice, title,
+  name. Chain: Remix Source -> Build Game. Build Game was reused as it is (`kits.build` sends kit
+  `remix` to `remix.build`); `preview.draw` sends it to `remix.preview_image`.
+- **A knob is a `constant kX = value` line.** Only the value is replaced, the comment stays. Defaults are
+  read from the game's file at every build, so if the owner retunes the original, dice 0 follows him.
+  A knob that is missing, or there twice, stops the build with a plain message.
+- **Rolls stay inside the safe range** (`roll_in`): dice 1 can reach either end and never passes it.
+  `assemble.roll` was not used: it wanders by a share of the value, which throws ratios like kRollDrag
+  0.95 straight to their limits (the "dice on a ratio" trap above).
+- **Knobs:** Squad Buggy 11 (kGrav kJumpV kShotV kSeg kCraterR kCraterD kFlagGap kTowerGap kHoldSteps
+  kSnipeRange kRoundV), Vector Toss 23 (arena 4, ball 5, heroes 7, rules 4, colours 3). Each has its
+  node name in the table already (buggy / terrain / enemies; arena / ball / heroes / rules / palette),
+  ready for step 2. A knob no node has set is rolled with dice 0.5 (`FREE_DICE`) times the master dice.
+- **Fix-ups already in** (a Queue never gives a dead game): Squad Buggy's jump is kept between 85 and
+  300 high (craters stack to 70 deep; jump height = kJumpV^2 / (2 kGrav)). Vector Toss: the floor is whole
+  tiles (kHalfW, kHalfD snapped to kTile), a jump clears the level walls (32 high), kReach stays under
+  the ceiling, and kCamUp / kCamBack follow the arena's size (never rolled).
+- **Ranges that are narrow on purpose:** kSeg only 20..30 (Squad.Ground has a literal 24 slices behind
+  the buggy, so shorter segments would leave a gap on the right); kHalfW not under 240 (the level walls
+  stand up to 120 from the centre).
+- **Data:** Vector Toss finds its clips and banter by fixed paths (`Game.FindFile("LIB_GAMES/...")`),
+  not by its own name, so a renamed copy finds them. Nothing had to be pinned.
+- **Header:** line 2 gets the new card name and "(remixed in ComfyUI from <game>, seed N)"; a `## REMIX`
+  block before the closing line lists every changed constant (was -> now) and the fix-up notes.
+  The original's CONTROLS / RULES words are kept as they are, so "20 seconds" or "costs 3 points" can
+  be out of date in a variant: the REMIX block is the truth. (Step 2 could rewrite those words.)
+- **Tests:** `python3 -I tests/remix_play_test.py --real` : 10 seeds of each game compile and play 600
+  steps on the stand-ins (stubs + LIB_ig3d's alias file: without the aliases `Camera.Reset` is not
+  found). Squad Buggy drives, jumps and fires and gets forward; Vector Toss plays itself and makes 3-4
+  catches. Seed 1 of each also runs and draws in the Game Player on the generated engine. Dice 0 gives
+  the original's numbers; 10 seeds give 10 different games. The pack loads with ComfyUI's own Python
+  (32 nodes) and gives a `[1,600,900,3]` preview.
+- **Not done, not tested:** nothing is installed into ComfyUI yet (`tools/install.sh` is step 2), no
+  workflow files, nobody has played a variant. Squad Buggy's colours are literals, not constants:
+  its Palette needs the mapping table (step 2). The preview is bars, not a still of the game.
+- **Step 2 next (on his word):** the per-game nodes (they write into `g["k"]["remix"]["set"]`), Mutate,
+  the remaining fix-ups, the two stills, four workflow files, install, restart, Queue.

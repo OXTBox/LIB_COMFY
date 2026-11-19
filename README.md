@@ -19,6 +19,8 @@ parts the chain needs and writes a playable `Vibecode3D_Play_<Name>.livecodescri
 | `tests/kit_play_test.py` | builds every kit and plays it headless in OXT-Beyond: stand-ins with the autopilot, then the real engine |
 | `workflows/vector_pong_variants.json` | drag this into ComfyUI: Game Start, Palette, Court, 4 Paddles, Ball, Match Rules, Build Game, Preview |
 | `workflows/vector_pong_variants_api.json` | the same for `tools/queue.sh` |
+| `ComfyUI-Vibecode3D/kits/remix.py` | **Remix** (branch `comfy-remix`, step 1): Remix Source -> Build Game writes a variant of Squad Buggy or Vector Toss with its `constant` lines moved by the seed inside safe ranges; the originals in LIB_GAMES are only read |
+| `tests/remix_play_test.py [--real]` | 10 seeds of each remix compile and play 600 steps headless |
 | `tools/install.sh` | copies the pack into Comfy Desktop's `custom_nodes` (restart ComfyUI after) |
 | `tools/queue.sh [seed] [count]` | queues variants from WSL (ComfyUI on Windows 127.0.0.1:8188, reached through Windows curl) |
 | `tools/make_workflow.py` | writes both workflow files |
