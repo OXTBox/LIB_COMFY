@@ -7,6 +7,7 @@ from .. import assemble as A
 KIT = "cdodge"
 PREFIX = "Dodge"
 TITLE = "lane dodger"
+GENRE = "Dodge"            # the genre the Comfy Games app files it under
 RUNNERS = ("ship", "tri", "saucer", "diamond", "bug")
 HAZARDS = ("rock", "diamond", "crab", "bug", "square", "tri", "star", "ring")
 PICKUPS = ("coin", "shield", "slow", "life")

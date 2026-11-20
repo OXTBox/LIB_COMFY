@@ -9,11 +9,13 @@ Seed and dice: every number a node sets can wander from its value when the game 
 seed. dice 0 = exactly as set; 1 = up to 60% either way. Same seed, same game.
 """
 import colorsys
+import datetime
 import os
 import random
 import re
 
 KIT = "cpong"
+GENRE = "Pong"           # the genre the Comfy Games app files it under
 SIDES = ("L", "R", "T", "B")
 STYLES = ("classic", "grid", "rings", "bare")
 SHAPES = ("square", "diamond", "ring")
@@ -233,6 +235,12 @@ def parts_needed(g):
     return parts
 
 
+def comfy_line(genre, seed):
+    """the line the Comfy Games app reads a game's genre, seed and build time from (LIB_COMFY/Player).
+    A plain comment, written right under the header block."""
+    return "-- comfy: genre=%s seed=%s built=%s" % (genre, seed, datetime.datetime.now().isoformat(timespec="seconds"))
+
+
 def safe_name(name):
     n = re.sub(r"[^A-Za-z0-9]", "", name or "")
     return n or "ComfyPong"
@@ -249,7 +257,7 @@ def header(g, name, parts):
         "## RULES     a ball past a goal mouth is a point for the other team. First to %s wins the"
         % g["rules"]["win"],
         "##           level; %s levels, each one faster." % g["rules"]["levels"],
-        "#" * 86, ""])
+        "#" * 86, comfy_line(GENRE, g["seed"]), ""])
 
 
 def build(game, projects_root, out_dir=None, name=None):

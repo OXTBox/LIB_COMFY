@@ -108,6 +108,25 @@ def rocks(small=False):
 
 
 KITS = {"brick": brick, "wave": wave, "coil": coil, "dodge": dodge, "lander": lander, "rocks": rocks}
+
+
+def pong():
+    """the Pong starter chain (as tools/make_workflow.py writes vector_pong_variants), for tools/make_game.py.
+    Not in KITS: Pong is assemble.py's own kit and has no autopilot for kit_play_test."""
+    def pad(side, control, length, speed, inset, skill, appear):
+        return ("VC3D_Paddle", {"side": side, "control": control, "team": AUTO, "length": length, "speed": speed,
+                                "inset": inset, "skill": skill, "color": AUTO, "appear": appear, "dice": 0.5})
+    return [("VC3D_GameStart", {"title": "Comfy Pong", "name": "ComfyPong", "seed": 1, "dice": 1.0}),
+            ("VC3D_Palette", {"hue": 190, "scheme": "random", "dice": 0.5}),
+            ("VC3D_Court", {"width": 760, "height": 420, "style": "random", "grid": 60, "wall_color": AUTO,
+                            "goal_color": AUTO, "dice": 0.5}),
+            pad("L", "arrows", 90, 9.0, 24, 0.6, 1.0), pad("R", "cpu", 90, 8.0, 24, 0.6, 1.0),
+            pad("T", "cpu", 120, 8.0, 24, 0.6, 0.5), pad("R", "cpu", 60, 8.0, 220, 0.5, 0.4),
+            ("VC3D_Ball", {"size": 14, "speed": 7.0, "speed_up": 1.05, "top_speed": 16.0, "count": 1, "shape": "random",
+                           "color": AUTO, "dice": 0.5}),
+            ("VC3D_MatchRules", {"points_to_win": 5, "levels": 3, "level_speed_up": 0.15, "dice": 0.5})]
+
+
 # what each kit's game is called in xTalk, for tests that read its state
 PREFIX = {"brick": "Brick", "wave": "Wave", "coil": "Coil", "dodge": "Dodge", "lander": "Lander", "rocks": "Rocks"}
 

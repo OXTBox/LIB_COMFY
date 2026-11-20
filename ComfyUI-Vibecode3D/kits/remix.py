@@ -155,11 +155,11 @@ MAX_RULES = 8
 
 GAMES = {
     "squad": {"label": "Squad Buggy", "file": "Vibecode3D_Play_SquadBuggy.livecodescript",
-              "name": "ComfySquad", "prefix": "Squad", "knobs": SQUAD_KNOBS, "patches": SQUAD_PATCHES,
+              "name": "ComfySquad", "genre": "Squad", "prefix": "Squad", "knobs": SQUAD_KNOBS, "patches": SQUAD_PATCHES,
               "colors": SQUAD_COLORS, "derived": ("kSlices",),
               "events": SQUAD_EVENTS, "actions": SQUAD_ACTIONS, "spark": "cBomb"},
     "toss": {"label": "Vector Toss", "file": "Vibecode3D_Play_VectorToss.livecodescript",
-             "name": "ComfyToss", "prefix": "VT", "knobs": TOSS_KNOBS, "patches": {},
+             "name": "ComfyToss", "genre": "Toss", "prefix": "VT", "knobs": TOSS_KNOBS, "patches": {},
              "colors": TOSS_COLORS, "derived": ("kCamUp", "kCamBack"),
              "events": TOSS_EVENTS, "actions": TOSS_ACTIONS, "spark": "kBallColor"},
 }
@@ -589,7 +589,9 @@ def build(game, projects_root, out_dir, name):
     lines[1] = '## CARD SCRIPT: "Play.%s"   %s  (remixed in ComfyUI from %s, seed %s)' \
                % (name, kits.hud_safe(g["title"]), info["label"], g["seed"])
     end = next(i for i in range(2, len(lines)) if lines[i].startswith("#####"))
-    lines[end:end] = header_lines(g, info)
+    hl = header_lines(g, info)
+    lines[end:end] = hl
+    lines.insert(end + len(hl) + 1, A.comfy_line(info["genre"], g["seed"]))   # under the header (Comfy Games app)
     script = "\n".join(lines)
     if rules:
         script = script.rstrip("\n") + "\n" + event_handlers(g, info, rules)

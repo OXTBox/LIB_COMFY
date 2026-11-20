@@ -8,6 +8,7 @@ from .. import assemble as A
 KIT = "crock"
 PREFIX = "Rocks"
 TITLE = "rock blaster"
+GENRE = "Rocks"            # the genre the Comfy Games app files it under
 SHIPS = ("ship", "tri", "diamond")
 
 

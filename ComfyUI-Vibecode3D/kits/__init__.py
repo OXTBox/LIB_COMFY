@@ -15,6 +15,8 @@ remix.py is not a kit of parts: it rewrites the constants of a whole hand-made g
 import os
 import re
 
+from .. import assemble as A
+
 from . import brick, coil, dodge, lander, remix, rocks, wave  # noqa: E402
 
 KITS = {m.KIT: m for m in (brick, wave, coil, dodge, lander, rocks)}
@@ -68,7 +70,8 @@ def header(kit, g, name, parts):
     return "\n".join(["#" * 86,
                       '## CARD SCRIPT: "Play.%s"   %s  (made in ComfyUI, seed %s)' % (name, hud_safe(g["title"]), g["seed"]),
                       "## A %s put together by the Vibecode3D nodes from LIB_COMFY/parts: %s." % (kit.TITLE, ", ".join(parts))]
-                     + ["## " + line for line in kit.rules_lines(g)] + ["#" * 86, ""])
+                     + ["## " + line for line in kit.rules_lines(g)]
+                     + ["#" * 86, A.comfy_line(getattr(kit, "GENRE", kit.TITLE.title().replace(" ", "")), g["seed"]), ""])
 
 
 def build(game, projects_root, out_dir, name):

@@ -8,6 +8,7 @@ from .. import assemble as A
 KIT = "cland"
 PREFIX = "Lander"
 TITLE = "lander"
+GENRE = "Lander"            # the genre the Comfy Games app files it under
 MODES = ("rotate", "slide")
 
 
