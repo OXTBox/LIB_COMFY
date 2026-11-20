@@ -10,7 +10,7 @@ OXT-Beyond). It walks up from its own folder to the first folder holding `games/
 
 | In the window | Does |
 |---|---|
-| GENRE (left) | All games, then the genres of `LIB_COMFY/genres.tsv` (Pong, Bricks, Waves, Worm, Dodge, Lander, Rocks, Squad, Toss), then any other genre a game says it is, with counts |
+| GENRE (left) | All games, then the genres of `LIB_COMFY/genres.tsv` (Pong, Bricks, Waves, Worm, Dodge, Lander, Rocks, Squad, Toss, Photon), then any other genre a game says it is, with counts |
 | GAMES (middle) | the games of that genre, with their stars. **Best rated** (most stars, newest first among equals), **Newest** (date built), **A-Z** |
 | ✦✦✦✧✧ (right) | the game's stars: click one to set, the same one again to take them away; keys 1-5 (0 clears) |
 | PLAY (Enter, double-click) | starts a second copy of the program with `-game <file>`: one game per program |

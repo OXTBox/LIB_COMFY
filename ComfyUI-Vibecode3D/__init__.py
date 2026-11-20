@@ -510,12 +510,12 @@ class RemixSource:
     @classmethod
     def INPUT_TYPES(cls):
         return {"required": {
-            "source": (list(remix.LABELS), {"tooltip": "the hand-made game to remix (it is read, never changed)"}),
+            "source": (list(remix.LABELS), {"tooltip": "the hand-made game to remix (it is read, never changed); Photon Ball = dangerous mode"}),
             "seed": ("INT", {"default": 1, "min": 0, "max": 2 ** 31 - 1, "control_after_generate": True}),
             "dice": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1.0, "step": 0.05,
                                "tooltip": "master dice: 0 = the original game, 1 = the seed moves every knob"}),
             "title": ("STRING", {"default": "auto", "tooltip": "auto = <game> Remix"}),
-            "name": ("STRING", {"default": "auto", "tooltip": "file name; auto = ComfySquad / ComfyToss"}),
+            "name": ("STRING", {"default": "auto", "tooltip": "file name; auto = ComfySquad / ComfyToss / ComfyPhoton"}),
         }}
     RETURN_TYPES = GAME
     RETURN_NAMES = ("game",)
@@ -616,6 +616,50 @@ _node("VC3D_RemixMutate", "Mutate (remix)", CAT_REMIX,
       [("chance", _float(0.6, 0.0, 1.0, 0.05, "how often a seed gets mutated (1 = every Queue)")),
        ("most", _int(3, 1, 3, 1, "at most this many numbers go to the edge"))],
       lambda game, chance, most: remix.mutate(game, chance, most))
+
+# ---------------------------------------------------------------- Photon Ball: dangerous mode
+# Remix Source (Photon Ball) -> Walls -> Break Rules -> (Mutate) -> Build Game. kits/photon.py
+from .kits import photon  # noqa: E402
+
+CAT_PHOTON = "Vibecode3D/Photon Ball"
+
+
+def _photon_set(game, what, dice, **given):
+    g, r = remix._mine(game, "photon", what.title() + " node")
+    if r is None:
+        return g
+    r[what] = {"given": given, "dice": max(0.0, min(1.0, dice * g["dice"]))}
+    return g
+
+
+_node("VC3D_PhotonWalls", "Walls (Photon Ball dangerous)", CAT_PHOTON,
+      "Photon Ball's three walls (never the camera side), made by the seed: ledges and pillars against the "
+      "walls, ramps whose high side meets their ledge, kicker slopes, and flat emblems (* far wall +1 a bank; "
+      "P / G back walls mend a square). Every map is checked (home squares plain, every square reachable, "
+      "the halves fair); a seed that fails is made again, never written broken.",
+      [("density", _float(0.5, 0.0, 1.0, 0.05, "how many features along the walls (0 = bare walls)")),
+       ("max_height", _int(60, 20, 120, 5, "the tallest pillar (hu; 1 hu = 1.5 units; a jump reaches 20)")),
+       ("ramps", _float(0.6, 0.0, 1.0, 0.05, "chance a ledge gets a ramp up to it (then it may be taller than a jump)")),
+       ("kickers", _float(0.5, 0.0, 1.0, 0.05, "how many kicker slopes against the walls (they throw the ball back)")),
+       ("far_emblems", _int(1, 0, 4, 1, "stars on the far wall: +1 for each bank off one")),
+       ("back_emblems", _int(1, 0, 2, 1, "emblems on each back wall (P, G): the ball striking one mends a square")),
+       ("emblem_width", _int(2, 1, 4, 1, "squares wide")),
+       ("symmetry", _float(0.6, 0.0, 1.0, 0.05, "chance GLAZE's half mirrors PROMPT's (else each its own, kept fair)")),
+       ("dice", _float(0.3, 0.0, 1.0, 0.05, "how far the seed may move these settings"))],
+      lambda game, dice, **k: _photon_set(game, "walls", dice, **k))
+_node("VC3D_PhotonBreakRules", "Break Rules (Photon Ball dangerous)", CAT_PHOTON,
+      "Which floor rule each match plays (1 the ball breaks a square, 2 every bounce breaks, 3 bounces crack "
+      "around, 4 bounces punch holes) and how fast broken squares fall. danger 0 = gentle, 1 = it starts bad "
+      "and gets worse fast. The last match's rule repeats.",
+      [("danger", _float(0.5, 0.0, 1.0, 0.05, "0 gentle .. 1 brutal: rules start higher, squares fall sooner, shorter matches")),
+       ("order", _pick(photon.ORDERS, "climb", "climb = worse each match; shuffle = 1-4 in any order; "
+                       "random = each match rolled; hand-made = 1,2,3,4 as the game has it")),
+       ("matches", _int(4, 2, 8, 1, "how many matches the list holds (the last repeats)")),
+       ("crumble_off", _float(2.5, 0.8, 6.0, 0.1, "seconds a broken square holds after you step off (danger shortens)")),
+       ("crumble_on", _float(1.5, 0.5, 4.0, 0.1, "seconds it holds after you step on it, rule 2 on")),
+       ("catches", _int(10, 4, 16, 1, "catches a match (danger takes some off)")),
+       ("dice", _float(0.5, 0.0, 1.0, 0.05, "how far the seed may move these settings"))],
+      lambda game, dice, **k: _photon_set(game, "breaks", dice, **k))
 
 NODE_CLASS_MAPPINGS = {
     "VC3D_GameStart": GameStart,

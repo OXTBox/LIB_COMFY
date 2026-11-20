@@ -1,7 +1,7 @@
 """Writes one starter workflow per genre kit, in both ComfyUI formats, from tools/kit_chains.py:
   workflows/<kit>_variants.json       drag into ComfyUI (the editor format)
   workflows/<kit>_variants_api.json   for queueing from a script (POST /prompt)
-and the two remix chains: workflows/squad_remix(.json, _api.json), toss_remix(.json, _api.json)
+and the remix chains: workflows/squad_remix(.json, _api.json), toss_remix(...), photon_dangerous(...)
 Widget order comes from each node's INPUT_TYPES, so the files follow the nodes as they are.
     python3 -I tools/make_kit_workflows.py"""
 import json
@@ -77,7 +77,7 @@ def main():
         n, l = write(kit, vc, out_dir)
         print("%s: %d nodes, %d links" % (kit, n, l))
     for game in kit_chains.REMIXES:
-        n, l = write(game, vc, out_dir, kit_chains.remix_chain(vc, game), "%s_remix" % game)
+        n, l = write(game, vc, out_dir, kit_chains.remix_chain(vc, game), kit_chains.WORKFLOW.get(game, "%s_remix" % game))
         print("%s remix: %d nodes, %d links" % (game, n, l))
 
 

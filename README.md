@@ -22,6 +22,9 @@ parts the chain needs and writes a playable `Vibecode3D_Play_<Name>.livecodescri
 | `ComfyUI-Vibecode3D/kits/remix.py` | **Remix** (Vibecode3D/Remix, branch `comfy-remix`): variants of the whole hand-made games Squad Buggy and Vector Toss. The originals in LIB_GAMES are only read |
 | `workflows/squad_remix.json`, `toss_remix.json` | drag into ComfyUI: Remix Source, the game's nodes, Mutate, Build Game (`_api.json` for `tools/queue.sh 1 5 squad_remix`) |
 | `tests/remix_play_test.py [--seeds 1-50] [--real]` | remixes compile and play 600 steps headless |
+| `ComfyUI-Vibecode3D/kits/photon.py` | **Photon Ball dangerous mode** (Vibecode3D/Photon Ball, branch `comfy-photon-ball`): seeded walls (ledges, pillars, ramps, kickers, emblems) checked against the fairness rules, and the break rules per match by a danger knob. Remix Source -> Walls -> Break Rules -> Mutate -> Build Game |
+| `workflows/photon_dangerous.json` | that chain (genre Photon in the Comfy Games app; `_api.json` for `tools/queue.sh 1 5 photon_dangerous`) |
+| `tests/photon_play_test.py [--seeds 1-8] [--real]` | 600 seeds of walls checked, break rules checked, seeds built and played 3000 steps headless; OXT-BEYOND/tests/t65 does the same from xTalk |
 | `tools/install.sh` | copies the pack into Comfy Desktop's `custom_nodes` (restart ComfyUI after) |
 | `tools/queue.sh [seed] [count]` | queues variants from WSL (ComfyUI on Windows 127.0.0.1:8188, reached through Windows curl) |
 | `tools/make_workflow.py` | writes both workflow files |

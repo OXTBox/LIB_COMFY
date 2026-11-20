@@ -11,3 +11,4 @@ Lander	kit:lander	Set the craft down gently on the pad	lander_variants
 Rocks	kit:rocks	Blast the rocks, mind the saucer	rocks_variants
 Squad	remix:squad	Squad Buggy remixed: drive, jump, hold the flags	squad_remix
 Toss	remix:toss	Vector Toss remixed: throw, catch, keep the floor	toss_remix
+Photon	remix:photon	Photon Ball, dangerous: the seed builds the walls and the break rules	photon_dangerous
