@@ -224,5 +224,5 @@ Branch `comfy-remix`. Brief: `Next_Steps_With_Claude/FABLE_JOB_4_COMFY_REMIX.md`
 - Every build now has `-- comfy: genre=<g> seed=<n> built=<iso>` right under the header block
   (`assemble.comfy_line`; a kit's `GENRE`, a remix game's `"genre"`). A new kit: give it `GENRE` and a line
   in genres.tsv, and its chain in kit_chains.py.
-- Trap met: on Windows, `shell()` runs `cmd /C <line>`; a line holding more than two quotes loses its first
+- Known Windows trap (handled; not yet seen on this PC, the exe is not rebuilt): `shell()` runs `cmd /C <line>`; a line holding more than two quotes loses its first
   and last quote, so the app wraps such lines in one more pair (CG.MakeCommand, CG.ComfyCommand).
