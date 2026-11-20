@@ -88,3 +88,9 @@ tile). `random` lets the seed pick. Dice 0, no Mutate, no When = the original ga
 rules_lines, preview). Copy the smallest one (`dodge.py`), write `parts/<kit>/core.part.livecodescript`
 on `parts/common/vec` with `Game.OnStart`, `Game.OnUpdate`, `PREFIX.State()` and `PREFIX.TestAuto`,
 add the kit to `KITS` in `kits/__init__.py` and `tools/kit_chains.py`.
+
+## Licence
+
+GPL-3.0 (see `LICENSE`), because the xTalk work here is built on the GPL-licensed LiveCode Community 9 engine. Copyright (c) 2026 xAction.
+
+The Python files (`.py`) and other material that is not xTalk are also offered under the MIT licence, Copyright (c) 2026 xAction: you may use them under either licence.
