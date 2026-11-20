@@ -7,6 +7,7 @@ from .. import assemble as A
 KIT = "cwave"
 PREFIX = "Wave"
 TITLE = "wave shooter"
+GENRE = "Waves"            # the genre the Comfy Games app files it under
 FORMATIONS = ("block", "vee", "diamond", "ragged", "swarm")
 FOES = ("crab", "bug", "saucer", "diamond", "tri", "star", "ring")
 SHIPS = ("ship", "tri", "saucer", "diamond")

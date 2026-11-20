@@ -7,6 +7,7 @@ from .. import assemble as A
 KIT = "cbrick"
 PREFIX = "Brick"
 TITLE = "brick breaker"
+GENRE = "Bricks"            # the genre the Comfy Games app files it under
 PATTERNS = ("solid", "checker", "pyramid", "columns", "frame", "holes")
 POWERS = ("wide", "multi", "slow", "life")
 

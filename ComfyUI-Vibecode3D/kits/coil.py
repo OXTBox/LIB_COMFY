@@ -7,6 +7,7 @@ from .. import assemble as A
 KIT = "ccoil"
 PREFIX = "Coil"
 TITLE = "grid worm"
+GENRE = "Worm"            # the genre the Comfy Games app files it under
 EDGES = ("walls", "wrap")
 BLOCKS = ("scatter", "bars", "box")
 FOODS = ("plain", "gold", "shrink", "slow")

@@ -1,0 +1,13 @@
+# The genres the Comfy Games app (Player/) offers: one line each, tab separated. A new kit = one more line.
+# genre	maker	about	workflow
+# genre: the name in the app and in a game's header (-- comfy: genre=...). maker: how tools/make_game.py builds one
+# (a kit_chains kit, pong, or remix:<game>). workflow: the starter workflow in workflows/ (Open in ComfyUI).
+Pong	pong	Paddles and a ball: first to score wins the level	vector_pong_variants
+Bricks	kit:brick	Break every brick with a bat and a ball	brick_variants
+Waves	kit:wave	Shoot the waves before they land	wave_variants
+Worm	kit:coil	Eat, grow, never bite your own tail	coil_variants
+Dodge	kit:dodge	Run the lanes and dodge what falls	dodge_variants
+Lander	kit:lander	Set the craft down gently on the pad	lander_variants
+Rocks	kit:rocks	Blast the rocks, mind the saucer	rocks_variants
+Squad	remix:squad	Squad Buggy remixed: drive, jump, hold the flags	squad_remix
+Toss	remix:toss	Vector Toss remixed: throw, catch, keep the floor	toss_remix
