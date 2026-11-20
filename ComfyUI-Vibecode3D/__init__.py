@@ -500,6 +500,123 @@ _node("VC3D_RockRules", "Rock Rules (Vibecode3D)", CAT_ROCK,
        ("extra_ship_every", _int(10000, 0, 50000, 500)), ("dice", _dice())],
       lambda game, **k: rocks.rules(game, **k))
 
+# ---------------------------------------------------------------- remix: variants of whole games
+from .kits import remix  # noqa: E402
+
+CAT_REMIX = "Vibecode3D/Remix"
+
+
+class RemixSource:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {"required": {
+            "source": (list(remix.LABELS), {"tooltip": "the hand-made game to remix (it is read, never changed)"}),
+            "seed": ("INT", {"default": 1, "min": 0, "max": 2 ** 31 - 1, "control_after_generate": True}),
+            "dice": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1.0, "step": 0.05,
+                               "tooltip": "master dice: 0 = the original game, 1 = the seed moves every knob"}),
+            "title": ("STRING", {"default": "auto", "tooltip": "auto = <game> Remix"}),
+            "name": ("STRING", {"default": "auto", "tooltip": "file name; auto = ComfySquad / ComfyToss"}),
+        }}
+    RETURN_TYPES = GAME
+    RETURN_NAMES = ("game",)
+    FUNCTION = "run"
+    CATEGORY = CAT_REMIX
+    DESCRIPTION = ("Starts a remix chain: Build Game writes a copy of Squad Buggy or Vector Toss with its "
+                   "numbers moved by the seed, inside safe ranges.")
+
+    def run(self, source, seed, dice, title, name):
+        return (remix.source(source, seed, dice, title, name),)
+
+
+def _remix_inputs(key, node, defaults):
+    out = []
+    for k in remix.GAMES[key]["knobs"]:
+        if k["node"] != node:
+            continue
+        v = max(k["lo"], min(k["hi"], defaults[k["name"]]))
+        if k["whole"]:
+            out.append((k["widget"], _int(int(v), k["lo"], k["hi"], 1, k["why"])))
+        else:
+            span = k["hi"] - k["lo"]
+            out.append((k["widget"], _float(float(v), k["lo"], k["hi"],
+                                            0.005 if span < 0.2 else 0.01 if span < 2 else 0.1, k["why"])))
+    return out + [("dice", _dice())]
+
+
+def _remix_node(cls_key, display, key, node, description, defaults):
+    def run(game, dice, **kw):
+        return remix.set_knobs(game, key, node, dice, **kw)
+    _node(cls_key, display, CAT_REMIX, description, _remix_inputs(key, node, defaults), run)
+
+
+_SQ = remix.slider_defaults(projects_root(), "squad")
+_TS = remix.slider_defaults(projects_root(), "toss")
+_remix_node("VC3D_RemixBuggy", "Buggy (Squad Buggy remix)", "squad", "buggy",
+            "Squad Buggy: gravity, the jump, your shots. The sliders start at the original's numbers.", _SQ)
+_remix_node("VC3D_RemixTerrain", "Terrain (Squad Buggy remix)", "squad", "terrain",
+            "Squad Buggy: the ground, the craters, how far apart flags and buildings stand.", _SQ)
+_remix_node("VC3D_RemixEnemies", "Enemies (Squad Buggy remix)", "squad", "enemies",
+            "Squad Buggy: snipers, flag holds, and how often and how fast walkers and bombers come "
+            "(a gap under 1 = more of them).", _SQ)
+_remix_node("VC3D_RemixArena", "Arena (Vector Toss remix)", "toss", "arena",
+            "Vector Toss: the box. Width and depth snap to whole tiles; the camera follows the size.", _TS)
+_remix_node("VC3D_RemixBall", "Ball (Vector Toss remix)", "toss", "ball",
+            "Vector Toss: the ball's size, gravity, bounce and how it rolls.", _TS)
+_remix_node("VC3D_RemixHeroes", "Heroes (Vector Toss remix)", "toss", "heroes",
+            "Vector Toss: PROMPT and GLAZE: run, jump, reach, throw power, the companion's patience.", _TS)
+_remix_node("VC3D_RemixRules", "Rules (Vector Toss remix)", "toss", "rules",
+            "Vector Toss: catches a level, hangs, falls.", _TS)
+
+
+def _hue():
+    return _int(0, -180, 180, 5, "turns every colour together (degrees round the colour wheel)")
+
+
+def _spread():
+    return _float(0.0, 0.0, 1.0, 0.05, "how far each colour may wander from the others (0 = they turn together)")
+
+
+_node("VC3D_RemixSquadPalette", "Palette (Squad Buggy remix)", CAT_REMIX,
+      "Squad Buggy's colours: turn them all, let them drift apart, or name the main three (#rrggbb).",
+      [("hue_shift", _hue()), ("spread", _spread()),
+       ("buggy", _color()), ("enemies", _color()), ("ground", _color()), ("dice", _dice())],
+      lambda game, hue_shift, spread, buggy, enemies, ground, dice: remix.set_palette(
+          game, "squad", hue_shift, spread, dice, cBuggy=buggy, cEnemy=enemies, cGround=ground))
+_node("VC3D_RemixTossPalette", "Palette (Vector Toss remix)", CAT_REMIX,
+      "Vector Toss's colours: PROMPT, GLAZE and the ball (auto = the original's, turned by hue_shift and dice).",
+      [("hue_shift", _hue()), ("spread", _spread()),
+       ("prompt", _color()), ("glaze", _color()), ("ball", _color()), ("dice", _dice())],
+      lambda game, hue_shift, spread, prompt, glaze, ball, dice: remix.set_palette(
+          game, "toss", hue_shift, spread, dice, kPromptColor=prompt, kGlazeColor=glaze, kBallColor=ball))
+def _when_node(cls_key, display, key, description):
+    info = remix.GAMES[key]
+    _node(cls_key, display, CAT_REMIX, description,
+          [("event", _pick(["random"] + sorted(info["events"]), sorted(info["events"])[0],
+                           "what has to happen (random = the seed picks)")),
+           ("action", _pick(["random"] + sorted(info["actions"]), "sparks", "what it sets off (random = the seed picks)")),
+           ("amount", _int(20, 1, 500, 1, "how many sparks, how many points, how many percent faster")),
+           ("text", ("STRING", {"default": "auto", "tooltip": "the words for the action 'say'"})),
+           ("color", _color()),
+           ("chance", _float(1.0, 0.05, 1.0, 0.05, "how often it goes off when the event happens (1 = every time)")),
+           ("appear", _chance())],
+          lambda game, event, action, amount, text, color, chance, appear: remix.when(
+              game, key, event, action, amount, text, color, chance, appear))
+
+
+_when_node("VC3D_RemixSquadWhen", "When (Squad Buggy remix)", "squad",
+           "Squad Buggy: when something happens, set something off (chain several). "
+           "When a sniper goes down: a bomber comes. When you jump: sparks.")
+_when_node("VC3D_RemixTossWhen", "When (Vector Toss remix)", "toss",
+           "Vector Toss: when something happens, set something off (chain several). "
+           "When a catch: crack a tile. When a hero falls: mend the floor.")
+
+_node("VC3D_RemixMutate", "Mutate (remix)", CAT_REMIX,
+      "Weird on purpose: by chance, pushes up to `most` numbers to the edge of their safe range and "
+      "names them in the title (LOW GRAVITY, SWARM, BIG BALL...). Put it last, before Build Game.",
+      [("chance", _float(0.6, 0.0, 1.0, 0.05, "how often a seed gets mutated (1 = every Queue)")),
+       ("most", _int(3, 1, 3, 1, "at most this many numbers go to the edge"))],
+      lambda game, chance, most: remix.mutate(game, chance, most))
+
 NODE_CLASS_MAPPINGS = {
     "VC3D_GameStart": GameStart,
     "VC3D_Palette": Palette,
@@ -508,6 +625,7 @@ NODE_CLASS_MAPPINGS = {
     "VC3D_Ball": Ball,
     "VC3D_MatchRules": MatchRules,
     "VC3D_BuildGame": BuildGame,
+    "VC3D_RemixSource": RemixSource,
 }
 NODE_DISPLAY_NAME_MAPPINGS = {
     "VC3D_GameStart": "Game Start (Vibecode3D)",
@@ -517,6 +635,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VC3D_Ball": "Ball (Vibecode3D)",
     "VC3D_MatchRules": "Match Rules (Vibecode3D)",
     "VC3D_BuildGame": "Build Game (Vibecode3D)",
+    "VC3D_RemixSource": "Remix Source (Vibecode3D)",
 }
 for _key, _display, _cls in _GENRE_NODES:
     NODE_CLASS_MAPPINGS[_key] = _cls

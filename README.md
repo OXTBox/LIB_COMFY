@@ -19,6 +19,9 @@ parts the chain needs and writes a playable `Vibecode3D_Play_<Name>.livecodescri
 | `tests/kit_play_test.py` | builds every kit and plays it headless in OXT-Beyond: stand-ins with the autopilot, then the real engine |
 | `workflows/vector_pong_variants.json` | drag this into ComfyUI: Game Start, Palette, Court, 4 Paddles, Ball, Match Rules, Build Game, Preview |
 | `workflows/vector_pong_variants_api.json` | the same for `tools/queue.sh` |
+| `ComfyUI-Vibecode3D/kits/remix.py` | **Remix** (Vibecode3D/Remix, branch `comfy-remix`): variants of the whole hand-made games Squad Buggy and Vector Toss. The originals in LIB_GAMES are only read |
+| `workflows/squad_remix.json`, `toss_remix.json` | drag into ComfyUI: Remix Source, the game's nodes, Mutate, Build Game (`_api.json` for `tools/queue.sh 1 5 squad_remix`) |
+| `tests/remix_play_test.py [--seeds 1-50] [--real]` | remixes compile and play 600 steps headless |
 | `tools/install.sh` | copies the pack into Comfy Desktop's `custom_nodes` (restart ComfyUI after) |
 | `tools/queue.sh [seed] [count]` | queues variants from WSL (ComfyUI on Windows 127.0.0.1:8188, reached through Windows curl) |
 | `tools/make_workflow.py` | writes both workflow files |
@@ -54,6 +57,18 @@ kit but Pong and the worm. Nodes marked *chain several* add one more each time.
 | Rock Blaster (`crock`) | Blaster Ship, Rock Field, Saucer, Rock Rules | turn, thrust and drift through wrapping space; big rocks split in two, then two again; a saucer now and then; one more rock each level |
 
 Each game has an autopilot for tests and demos (`Brick.TestAuto true` ...) and a `State()` line.
+
+## Remix (Squad Buggy, Vector Toss)
+
+**Remix Source** (which game, seed, master dice) starts the chain; **Build Game** ends it. Between them,
+any of the game's nodes: **Buggy**, **Terrain**, **Enemies**, **Palette** for Squad Buggy; **Arena**, **Ball**,
+**Heroes**, **Rules**, **Palette** for Vector Toss. Their sliders start at the original's numbers and
+can't leave a safe range; dice lets the seed move them. A number no node sets is rolled around the
+original. **Mutate** pushes up to three numbers to the edge and names them in the title
+("SQUAD BUGGY: AIR RAID, TOWER CITY"). **When** nodes add rules, several in a chain: an event (bomber
+down, sniper down, flag held, jump...; catch, drop, floor broke, hero falls...) sets off an action
+(sparks, score, say, a bomber comes, crater ahead, bounce...; extra hang, mend the floor, crack a
+tile). `random` lets the seed pick. Dice 0, no Mutate, no When = the original game.
 
 ## Adding a kind of part
 

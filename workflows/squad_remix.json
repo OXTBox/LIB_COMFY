@@ -1,0 +1,601 @@
+{
+ "last_node_id": 12,
+ "last_link_id": 11,
+ "nodes": [
+  {
+   "id": 1,
+   "type": "VC3D_RemixSource",
+   "pos": [
+    40,
+    60
+   ],
+   "size": [
+    300,
+    320
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "links": [
+      1
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VC3D_RemixSource"
+   },
+   "widgets_values": [
+    "Squad Buggy",
+    1,
+    "randomize",
+    1.0,
+    "auto",
+    "auto"
+   ]
+  },
+  {
+   "id": 2,
+   "type": "VC3D_RemixBuggy",
+   "pos": [
+    370,
+    60
+   ],
+   "size": [
+    300,
+    320
+   ],
+   "flags": {},
+   "order": 1,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "link": 1
+    }
+   ],
+   "outputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "links": [
+      2
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VC3D_RemixBuggy"
+   },
+   "widgets_values": [
+    0.18,
+    6.2,
+    22.0,
+    0.7
+   ]
+  },
+  {
+   "id": 3,
+   "type": "VC3D_RemixTerrain",
+   "pos": [
+    700,
+    60
+   ],
+   "size": [
+    300,
+    320
+   ],
+   "flags": {},
+   "order": 2,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "link": 2
+    }
+   ],
+   "outputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "links": [
+      3
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VC3D_RemixTerrain"
+   },
+   "widgets_values": [
+    20,
+    52,
+    38,
+    2400,
+    1100,
+    0.7
+   ]
+  },
+  {
+   "id": 4,
+   "type": "VC3D_RemixEnemies",
+   "pos": [
+    1030,
+    60
+   ],
+   "size": [
+    300,
+    320
+   ],
+   "flags": {},
+   "order": 3,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "link": 3
+    }
+   ],
+   "outputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "links": [
+      4
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VC3D_RemixEnemies"
+   },
+   "widgets_values": [
+    600,
+    620,
+    4.2,
+    1.0,
+    1.0,
+    1.0,
+    0.7
+   ]
+  },
+  {
+   "id": 5,
+   "type": "VC3D_RemixSquadPalette",
+   "pos": [
+    1360,
+    60
+   ],
+   "size": [
+    300,
+    320
+   ],
+   "flags": {},
+   "order": 4,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "link": 4
+    }
+   ],
+   "outputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "links": [
+      5
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VC3D_RemixSquadPalette"
+   },
+   "widgets_values": [
+    0,
+    0.15,
+    "auto",
+    "auto",
+    "auto",
+    0.7
+   ]
+  },
+  {
+   "id": 6,
+   "type": "VC3D_RemixSquadWhen",
+   "pos": [
+    40,
+    500
+   ],
+   "size": [
+    300,
+    320
+   ],
+   "flags": {},
+   "order": 5,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "link": 5
+    }
+   ],
+   "outputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "links": [
+      6
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VC3D_RemixSquadWhen"
+   },
+   "widgets_values": [
+    "bomber down",
+    "sparks",
+    30,
+    "auto",
+    "auto",
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "id": 7,
+   "type": "VC3D_RemixSquadWhen",
+   "pos": [
+    370,
+    500
+   ],
+   "size": [
+    300,
+    320
+   ],
+   "flags": {},
+   "order": 6,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "link": 6
+    }
+   ],
+   "outputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "links": [
+      7
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VC3D_RemixSquadWhen"
+   },
+   "widgets_values": [
+    "sniper down",
+    "bomber comes",
+    1,
+    "auto",
+    "auto",
+    1.0,
+    1.0
+   ]
+  },
+  {
+   "id": 8,
+   "type": "VC3D_RemixSquadWhen",
+   "pos": [
+    700,
+    500
+   ],
+   "size": [
+    300,
+    320
+   ],
+   "flags": {},
+   "order": 7,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "link": 7
+    }
+   ],
+   "outputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "links": [
+      8
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VC3D_RemixSquadWhen"
+   },
+   "widgets_values": [
+    "random",
+    "random",
+    20,
+    "auto",
+    "auto",
+    0.5,
+    0.7
+   ]
+  },
+  {
+   "id": 9,
+   "type": "VC3D_RemixSquadWhen",
+   "pos": [
+    1030,
+    500
+   ],
+   "size": [
+    300,
+    320
+   ],
+   "flags": {},
+   "order": 8,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "link": 8
+    }
+   ],
+   "outputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "links": [
+      9
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VC3D_RemixSquadWhen"
+   },
+   "widgets_values": [
+    "random",
+    "random",
+    20,
+    "auto",
+    "auto",
+    0.5,
+    0.7
+   ]
+  },
+  {
+   "id": 10,
+   "type": "VC3D_RemixMutate",
+   "pos": [
+    1360,
+    500
+   ],
+   "size": [
+    300,
+    320
+   ],
+   "flags": {},
+   "order": 9,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "link": 9
+    }
+   ],
+   "outputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "links": [
+      10
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VC3D_RemixMutate"
+   },
+   "widgets_values": [
+    0.6,
+    3
+   ]
+  },
+  {
+   "id": 11,
+   "type": "VC3D_BuildGame",
+   "pos": [
+    40,
+    940
+   ],
+   "size": [
+    300,
+    320
+   ],
+   "flags": {},
+   "order": 10,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "game",
+     "type": "VC3D_GAME",
+     "link": 10
+    }
+   ],
+   "outputs": [
+    {
+     "name": "script_path",
+     "type": "STRING",
+     "links": null,
+     "slot_index": 0
+    },
+    {
+     "name": "preview",
+     "type": "IMAGE",
+     "links": [
+      11
+     ],
+     "slot_index": 1
+    },
+    {
+     "name": "script",
+     "type": "STRING",
+     "links": null,
+     "slot_index": 2
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VC3D_BuildGame"
+   },
+   "widgets_values": [
+    true,
+    "LIB_COMFY games (kept apart from LIB_GAMES)"
+   ]
+  },
+  {
+   "id": 12,
+   "type": "PreviewImage",
+   "pos": [
+    370,
+    1380
+   ],
+   "size": [
+    620,
+    440
+   ],
+   "flags": {},
+   "order": 11,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 11
+    }
+   ],
+   "outputs": [],
+   "properties": {
+    "Node name for S&R": "PreviewImage"
+   },
+   "widgets_values": []
+  }
+ ],
+ "links": [
+  [
+   1,
+   1,
+   0,
+   2,
+   0,
+   "VC3D_GAME"
+  ],
+  [
+   2,
+   2,
+   0,
+   3,
+   0,
+   "VC3D_GAME"
+  ],
+  [
+   3,
+   3,
+   0,
+   4,
+   0,
+   "VC3D_GAME"
+  ],
+  [
+   4,
+   4,
+   0,
+   5,
+   0,
+   "VC3D_GAME"
+  ],
+  [
+   5,
+   5,
+   0,
+   6,
+   0,
+   "VC3D_GAME"
+  ],
+  [
+   6,
+   6,
+   0,
+   7,
+   0,
+   "VC3D_GAME"
+  ],
+  [
+   7,
+   7,
+   0,
+   8,
+   0,
+   "VC3D_GAME"
+  ],
+  [
+   8,
+   8,
+   0,
+   9,
+   0,
+   "VC3D_GAME"
+  ],
+  [
+   9,
+   9,
+   0,
+   10,
+   0,
+   "VC3D_GAME"
+  ],
+  [
+   10,
+   10,
+   0,
+   11,
+   0,
+   "VC3D_GAME"
+  ],
+  [
+   11,
+   11,
+   1,
+   12,
+   0,
+   "IMAGE"
+  ]
+ ],
+ "groups": [],
+ "config": {},
+ "extra": {},
+ "version": 0.4
+}

@@ -1,6 +1,7 @@
 """Writes one starter workflow per genre kit, in both ComfyUI formats, from tools/kit_chains.py:
   workflows/<kit>_variants.json       drag into ComfyUI (the editor format)
   workflows/<kit>_variants_api.json   for queueing from a script (POST /prompt)
+and the two remix chains: workflows/squad_remix(.json, _api.json), toss_remix(.json, _api.json)
 Widget order comes from each node's INPUT_TYPES, so the files follow the nodes as they are.
     python3 -I tools/make_kit_workflows.py"""
 import json
@@ -28,8 +29,9 @@ def widgets(cls, values):
     return out
 
 
-def write(kit, vc, out_dir):
-    steps = kit_chains.chain(kit) + [BUILD]
+def write(kit, vc, out_dir, steps=None, base=None):
+    steps = (steps or kit_chains.chain(kit)) + [BUILD]
+    base = base or "%s_variants" % kit
     nodes, links, api = [], [], {}
     per_row = 5
     for i, (key, values) in enumerate(steps, 1):
@@ -61,9 +63,9 @@ def write(kit, vc, out_dir):
     api[str(pid)] = {"class_type": "PreviewImage", "inputs": {"images": [str(len(steps)), 1]}}
     ui = {"last_node_id": pid, "last_link_id": len(steps), "nodes": nodes, "links": links,
           "groups": [], "config": {}, "extra": {}, "version": 0.4}
-    with open(os.path.join(out_dir, "%s_variants.json" % kit), "w") as f:
+    with open(os.path.join(out_dir, base + ".json"), "w") as f:
         json.dump(ui, f, indent=1)
-    with open(os.path.join(out_dir, "%s_variants_api.json" % kit), "w") as f:
+    with open(os.path.join(out_dir, base + "_api.json"), "w") as f:
         json.dump(api, f, indent=1)
     return len(nodes), len(links)
 
@@ -74,6 +76,9 @@ def main():
     for kit in kit_chains.KITS:
         n, l = write(kit, vc, out_dir)
         print("%s: %d nodes, %d links" % (kit, n, l))
+    for game in kit_chains.REMIXES:
+        n, l = write(game, vc, out_dir, kit_chains.remix_chain(vc, game), "%s_remix" % game)
+        print("%s remix: %d nodes, %d links" % (game, n, l))
 
 
 if __name__ == "__main__":

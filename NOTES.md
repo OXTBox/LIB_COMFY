@@ -119,3 +119,100 @@ the Game Browser. Read this before making more nodes or workflows.
   steps aside from bombs. `tests/kit_play_test.py --seed N` was run for seeds 1 to 10.
 - Ideas next: event nodes across kits ("when a brick breaks -> sparks / sound / speed up"), a Title Card node, sound
   once `Sound.Play` has sounds in the Game Player.
+
+## Remix: Squad Buggy and Vector Toss (18 Nov 2026, Fable, job 4) -- STEPS 1, 2 AND 3 DONE, waits for the owner's Queue
+
+Branch `comfy-remix`. Brief: `Next_Steps_With_Claude/FABLE_JOB_4_COMFY_REMIX.md`. Both games are Engine 1
+(pure xTalk) game scripts; the originals in LIB_GAMES are read and never changed.
+
+- **The chain:** Remix Source -> the game's nodes (any, in any order) -> Mutate -> Build Game. Build Game
+  was reused as it is (`kits.build` sends kit `remix` to `remix.build`; `preview.draw` to
+  `remix.preview_image`). Everything is in `kits/remix.py`; category Vibecode3D/Remix, 11 nodes:
+  Remix Source; Buggy, Terrain, Enemies, Palette (Squad Buggy); Arena, Ball, Heroes, Rules, Palette
+  (Vector Toss); Mutate. A node of the other game is left out with a note, it never breaks the Queue.
+- **Three kinds of knob** (tables at the top of remix.py):
+  - *constant*: a `constant kX = value` line; only the value is replaced, the comment stays. Defaults
+    are read from the game's file at every build, so dice 0 follows the owner's own retuning.
+  - *patch*: Squad Buggy's enemy pacing is numbers written into three lines, not constants
+    (`sNextEnemy`, `sESpeed`, `sNextFly`). `SQUAD_PATCHES` holds each exact line and its replacement:
+    the same sum times a factor. This is the answer to the owner's "we are unbeatable": walker_gap
+    0.3 = three times the walkers. If the original line changes, the build stops and says which.
+  - *colour*: Vector Toss has colour constants. Squad Buggy's are literals in the code:
+    `SQUAD_COLORS` maps literal -> role (buggy, flag, gunner, squad, ground, enemy, bomber, bomb,
+    tower) and the literal is replaced everywhere it stands, sparks too.
+- **Sliders start at the original's numbers**, read from the game files when ComfyUI starts (a typed
+  table, `FALLBACK`, only if the files can't be reached then). A saved workflow keeps the numbers it
+  was saved with.
+- **Rolls stay inside the safe range** (`roll_in`): dice 1 can reach either end and never passes it.
+  `assemble.roll` was not used: it wanders by a share of the value, which throws ratios like kRollDrag
+  0.95 straight to their limits (the "dice on a ratio" trap above). A knob no node has set is rolled
+  around the original with dice 0.5 times the master dice.
+- **Mutate** (chance, most 1-3): by the seed, pushes numbers to the edge of their safe range and writes
+  them into the title: "SQUAD BUGGY: AIR RAID, LONG HOLDS, TOWER CITY", "VECTOR TOSS: SUDDEN DEATH,
+  DEAD BALL, FLOATY BALL". The words are in the knob tables (`low`, `high`); a knob without a word
+  is never mutated. It runs before the fix-ups, so a mutation can't make a dead game.
+- **Fix-ups** (notes say what changed): Squad Buggy: the jump 85..300 high (craters stack to 70 deep),
+  craters no wider than a jump can cross, sniper rounds no faster than 0.4 of your shots, sniper range
+  shorter than the gap between towers. Vector Toss: the floor is whole tiles, a jump clears the level
+  walls (32), reach under the ceiling, run speed enough to get under a roof throw in a big arena, catch
+  radius wider than a big ball, the camera follows the arena's size.
+- **Ranges that are narrow on purpose:** kSeg only 20..30 (Squad.Ground has a literal 24 slices behind
+  the buggy); kHalfW not under 240 (the level walls stand up to 120 from the centre).
+- **Data:** Vector Toss finds its clips and banter by fixed paths (`Game.FindFile("LIB_GAMES/...")`),
+  not by its own name, so a renamed copy finds them. Nothing had to be pinned.
+- **Header:** line 2 gets the new card name, the title and "(remixed in ComfyUI from <game>, seed N)";
+  a `## REMIX` block lists every change (was -> now) and the notes. The original's CONTROLS / RULES
+  words are kept, so "20 seconds" can be out of date; the block says so.
+- **Stills:** Squad Buggy: the buggy, its jump as dots, a crater, a walker, a bomber, a tower, and
+  under it the course of one level (flags, towers, sniper range). Vector Toss: the arena from above
+  and from the side (a roof throw stepped as the game steps it), and the list of changes.
+  **Nobody has looked at them** (the images rule): the owner sees them first on the node.
+- **Workflows:** `workflows/squad_remix.json`, `toss_remix.json` (+ `_api.json`), written by
+  `tools/make_kit_workflows.py` from `kit_chains.remix_chain` (every node at its defaults, dice 0.7,
+  Mutate 0.6). `tools/queue.sh 1 5 squad_remix` queues five seeds.
+- **Tests:** `python3 -I tests/remix_play_test.py --real`: seeds compile and play 600 steps on the
+  stand-ins (stubs + LIB_ig3d's alias file: without it `Camera.Reset` is not found); even seeds use
+  the whole chain with Mutate always, odd seeds Remix Source alone. Run for seeds 1-50: 0 failed.
+  Squad Buggy drives, jumps and fires; Vector Toss plays itself and makes 3-5 catches. Seed 1 of each
+  runs and draws in the Game Player on the generated engine. Installed (`tools/install.sh`, both
+  installs), and both API workflows were run node by node from the installed pack with the install's
+  `.venv` python: 42 nodes, every widget default in range, `[1,600,900,3]` previews.
+- **Not tested:** ComfyUI was not running, so nothing was queued through it and the nodes were not
+  seen in its window. No person has played a variant: the autopilot proves a game runs, not that the
+  mutations are fun or fair (AIR RAID plus SWARM may be too much; that is what his notes are for).
+  The headless drive never gets stuck in a crater, so the crater fix-ups are sums, not play.
+- **Not built:** Squad Buggy's crew size (three soldiers is written through the code, not one number).
+
+### Step 3: the When nodes (events), same night
+
+- **Two nodes:** When (Squad Buggy remix), When (Vector Toss remix): event, action, amount, text,
+  color, chance (each time it happens), appear (is the rule in this seed's game). Chain several, at
+  most 8 (`MAX_RULES`). `random` for event or action lets the seed pick: that is where the odd ones
+  come from ("when a flag is held: crater ahead").
+- **Squad Buggy events:** bomber down, sniper down, walker shot, walker squashed, man overboard,
+  soldier lost, flag reached, flag held, crater dug, jump. **Actions:** sparks, score, say, extra life,
+  bomber comes, walkers faster, walker rush, crater ahead, bounce.
+- **Vector Toss events:** catch, big catch, rally, drop, floor broke, pit took the ball, hero falls,
+  new level. **Actions:** sparks, score, say, extra hang, mend the floor, crack a tile.
+- **How an event is found:** by one exact line of the original (`SQUAD_EVENTS`, `TOSS_EVENTS`: the
+  line, before or after, the two values handed over). Build puts `Remix.On "<event>", a, b` there,
+  only for events a rule uses, and `Remix.Flush` as the first line of `Game.OnUpdate`. The spots are
+  looked up BEFORE the colours are replaced (two anchors hold a colour literal). A line that is gone
+  or there twice stops the build and names it.
+- **Why a queue:** `Remix.On` only writes the event down; `Remix.Flush` runs the actions at the top of
+  the next step. Most events sit inside the game's own `repeat for each key` loops over walkers,
+  bombs and shots; an action that kills walkers there (a crater) would pull the list out from under
+  the loop. One step late can't be seen. Events raised while Flush runs are dropped (`sRemixBusy`),
+  so "when a crater is dug: crater ahead" makes one crater, not one every step for ever.
+- **Vector Toss trap:** `VT.Advance` (roof, wall and floor bounces) is also run for the ghost ball
+  and the companion's planning, so a hook there would fire on throws nobody made. No roof / wall
+  events for that reason; they need a flag saying "this is the real ball" in the original first.
+- **Adding an event or an action:** one line in the table. An action's lines may use tA, tB (the
+  event's values; Vector Toss: tA = the hero, or "*") and %(n)s, %(text)s, %(rgb)s.
+- **Tests added to `remix_play_test.py`:** a rule really goes off (Squad Buggy: 500 points a jump took
+  the score from 545 to 4065; Vector Toss: 20 a catch, 6 to 87); every event with every action (90
+  pairs, 48 pairs) is built, compiled and set off by hand without an error; seeds 1-50 with two set
+  rules and two random ones on even seeds: 0 failed. Installed; both API workflows run from the
+  installed pack (44 nodes).
+- **Not tested:** the actions on the real engine with a person playing (the stand-ins' FX.Sparks draws
+  nothing); whether a rule is fun. ComfyUI was still not running.
