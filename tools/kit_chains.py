@@ -144,7 +144,11 @@ def chain(kit, seed=1, small=False):
 DEFAULTS = "defaults"
 REMIXES = {"squad": ("Squad Buggy", ["VC3D_RemixBuggy", "VC3D_RemixTerrain", "VC3D_RemixEnemies", "VC3D_RemixSquadPalette"]),
            "toss": ("Vector Toss", ["VC3D_RemixArena", "VC3D_RemixBall", "VC3D_RemixHeroes", "VC3D_RemixRules",
-                                    "VC3D_RemixTossPalette"])}
+                                    "VC3D_RemixTossPalette"]),
+           # Photon Ball's dangerous mode (kits/photon.py): no When nodes (yet); workflow photon_dangerous
+           "photon": ("Photon Ball", ["VC3D_PhotonWalls", "VC3D_PhotonBreakRules"])}
+# the starter workflow's file name when it is not <game>_remix
+WORKFLOW = {"photon": "photon_dangerous"}
 
 
 WHEN = {"squad": ("VC3D_RemixSquadWhen", [("bomber down", "sparks", 30), ("sniper down", "bomber comes", 1)]),
@@ -169,8 +173,12 @@ def remix_chain(vc, game, seed=1, dice=0.7, mutate=0.6, rules=None):
         w["dice"] = dice
         if "spread" in w:
             w["spread"] = 0.15
+        if key == "VC3D_PhotonWalls":       # the walls node's own dice is gentler: dice 1 throws density to its ends
+            w["dice"] = min(dice, 0.4)
         steps.append((key, w))
-    if rules is None:
+    if game not in WHEN:
+        pass
+    elif rules is None:
         steps += [when(game, *r) for r in WHEN[game][1]]
         steps += [when(game, "random", "random", 20, 0.5, 0.7), when(game, "random", "random", 20, 0.5, 0.7)]
     else:

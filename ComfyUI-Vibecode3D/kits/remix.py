@@ -96,6 +96,17 @@ TOSS_KNOBS = [
 ]
 TOSS_COLORS = [("kPromptColor", None), ("kGlazeColor", None), ("kBallColor", None)]
 
+# Photon Ball (dangerous mode, photon.py): the walls and the break rules are made by its own two nodes;
+# these knobs are rolled around the original (and Mutate may push them to an edge)
+PHOTON_KNOBS = [
+    K("kGripMinMS", "heroes", "grip_min", 800, 2500, True, "ms a hero can hang at stamina 0", "WEAK GRIP", None),
+    K("kGripMaxMS", "heroes", "grip_max", 3000, 8000, True, "ms a hero can hang at stamina 100", None, "IRON GRIP"),
+    K("kMaxFalls", "rules", "max_falls", 2, 5, True, "fatal falls that end the game", "SUDDEN DEATH", None),
+    K("kHangEvery", "rules", "hang_every", 5, 20, True, "points for a new hang", None, "STINGY HANGS"),
+    K("kSmashV", "rules", "smash_speed", 1.0, 4.0, False, "landing faster than this smashes a broken square",
+      "GLASS FLOOR", None),
+]
+
 # ------------------------------------------------------------ events: "when this happens, do that"
 # An event is a spot in the original: an exact line (there once) and where the call goes. The
 # call only QUEUES the event (Remix.On); the actions run at the top of the next Game.OnUpdate
@@ -162,6 +173,10 @@ GAMES = {
              "name": "ComfyToss", "genre": "Toss", "prefix": "VT", "knobs": TOSS_KNOBS, "patches": {},
              "colors": TOSS_COLORS, "derived": ("kCamUp", "kCamBack"),
              "events": TOSS_EVENTS, "actions": TOSS_ACTIONS, "spark": "kBallColor"},
+    "photon": {"label": "Photon Ball", "file": "Vibecode3D_Play_PhotonBall.livecodescript",
+               "name": "ComfyPhoton", "genre": "Photon", "prefix": "PB", "knobs": PHOTON_KNOBS, "patches": {},
+               "colors": TOSS_COLORS, "derived": (),
+               "events": {}, "actions": {}, "spark": "kBallColor"},
 }
 LABELS = tuple(v["label"] for v in GAMES.values())
 FREE_DICE = 0.5      # the dice of a knob no node has set
@@ -474,7 +489,7 @@ def fixups(game, defaults):
                 words.append(k[side])
             g["title"] = "%s: %s" % (info["label"], ", ".join(words))
             g["mutated"] = words
-    (fix_squad if key == "squad" else fix_toss)(g, vals, defaults)
+    {"squad": fix_squad, "toss": fix_toss, "photon": fix_photon}[key](g, vals, defaults)
     g["k"]["vals"] = vals
     g["k"]["defaults"] = {n: defaults.get(n) for n in vals}
     return g
@@ -502,6 +517,40 @@ def fix_squad(g, v, d):
         g["notes"].append("sniper range cut to %d: a gap between towers" % v["kSnipeRange"])
     # the ground strip still has to cover the screen
     v["kSlices"] = max(d["kSlices"], int(math.ceil(d["kSlices"] * d["kSeg"] / float(v["kSeg"]))))
+
+
+def fix_photon(g, v, d):
+    """the grip at stamina 0 shorter than at 100; then the seed's walls and break rules (photon.py).
+    No Walls / Break Rules node and dice 0: the hand-made walls and rules"""
+    from . import photon
+    if v["kGripMinMS"] > v["kGripMaxMS"] - 1000:
+        v["kGripMinMS"] = max(800, v["kGripMaxMS"] - 1000)
+        g["notes"].append("grip at stamina 0 cut to %d ms: shorter than when rested" % v["kGripMinMS"])
+    r = g["k"]["remix"]
+    root = g.get("projects_root")
+    p = {"walls_text": None, "walls_summary": "hand-made"}
+    wset = r.get("walls")
+    if wset is not None or g["dice"] > 0:
+        wset = wset or {"given": {}, "dice": photon_free_dice(g)}
+        w, notes = photon.make_walls(g["seed"], wset["given"], wset["dice"], root)
+        g["notes"] += notes
+        p["walls_text"] = w.text()
+        p["walls_summary"] = photon.summary(w)
+    bset = r.get("breaks")
+    if bset is None and g["dice"] == 0:
+        bset = {"given": {"order": "hand-made"}, "dice": 0.0}
+    bset = bset or {"given": {}, "dice": photon_free_dice(g)}
+    b = photon.make_breaks(g["seed"], bset["given"], bset["dice"])
+    probs = photon.validate_breaks(b)
+    if probs:
+        raise ValueError("photon: the break rules came out wrong: %s" % probs)
+    g["notes"] += b["notes"]
+    p["breaks"] = b
+    g["k"]["photon"] = p
+
+
+def photon_free_dice(g):
+    return FREE_DICE * g["dice"]
 
 
 def fix_toss(g, v, d):
@@ -567,6 +616,7 @@ def build(game, projects_root, out_dir, name):
     with open(source_path(projects_root, key), encoding="utf-8") as f:
         text = f.read().replace("\r\n", "\n")
     defaults = read_defaults(key, text)
+    game = dict(game, projects_root=projects_root)
     g = fixups(game, defaults)
     for n in info["derived"]:
         g["k"]["defaults"][n] = defaults.get(n)
@@ -583,6 +633,13 @@ def build(game, projects_root, out_dir, name):
                 text = set_literal(text, n, literal[n], v)
         else:
             text = set_constant(text, n, v)
+    if out_dir is None:
+        out_dir = os.path.join(projects_root, "LIB_COMFY", "games")
+    if key == "photon":
+        from . import photon
+        g["file_name"] = name
+        text = photon.apply(text, g, out_dir, name)
+        text = set_constant(text, "kMatchCatches", g["k"]["photon"]["breaks"]["catches"])
     lines = text.split("\n")
     if "CARD SCRIPT" not in lines[1]:
         raise ValueError("remix: line 2 of %s is not its CARD SCRIPT line" % info["file"])
@@ -590,13 +647,14 @@ def build(game, projects_root, out_dir, name):
                % (name, kits.hud_safe(g["title"]), info["label"], g["seed"])
     end = next(i for i in range(2, len(lines)) if lines[i].startswith("#####"))
     hl = header_lines(g, info)
+    if key == "photon":
+        from . import photon
+        hl = hl[:1] + photon.header_lines(g) + hl[1:]
     lines[end:end] = hl
     lines.insert(end + len(hl) + 1, A.comfy_line(info["genre"], g["seed"]))   # under the header (Comfy Games app)
     script = "\n".join(lines)
     if rules:
         script = script.rstrip("\n") + "\n" + event_handlers(g, info, rules)
-    if out_dir is None:
-        out_dir = os.path.join(projects_root, "LIB_COMFY", "games")
     os.makedirs(out_dir, exist_ok=True)
     path = os.path.join(out_dir, "Vibecode3D_Play_%s.livecodescript" % name)
     with open(path, "w", encoding="utf-8", newline="\n") as f:
@@ -615,7 +673,11 @@ def preview_image(g, im, d):
     head = col("cBuggy") if key == "squad" else col("kPromptColor")
     d.text((20, 12), "%s   seed %s   %s" % (g["title"].upper(), g["seed"], g.get("file_name", "")), fill=head)
     d.text((20, 30), "remix of %s: %d numbers changed" % (GAMES[key]["label"], len(changed(g))), fill=(120, 130, 140))
-    (still_squad if key == "squad" else still_toss)(g, d, v, col, W, H)
+    if key == "photon":
+        from . import photon
+        photon.still(g, d, v, col, W, H)
+    else:
+        (still_squad if key == "squad" else still_toss)(g, d, v, col, W, H)
     rules = g["k"]["remix"].get("events") or []
     for i, e in enumerate(rules[:4]):
         d.text((470, 12 + 15 * i), rule_words(e), fill=(120, 255, 160))

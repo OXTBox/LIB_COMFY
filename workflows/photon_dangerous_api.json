@@ -1,0 +1,77 @@
+{
+ "1": {
+  "class_type": "VC3D_RemixSource",
+  "inputs": {
+   "source": "Photon Ball",
+   "seed": 1,
+   "dice": 1.0,
+   "title": "auto",
+   "name": "auto"
+  }
+ },
+ "2": {
+  "class_type": "VC3D_PhotonWalls",
+  "inputs": {
+   "density": 0.5,
+   "max_height": 60,
+   "ramps": 0.6,
+   "kickers": 0.5,
+   "far_emblems": 1,
+   "back_emblems": 1,
+   "emblem_width": 2,
+   "symmetry": 0.6,
+   "dice": 0.4,
+   "game": [
+    "1",
+    0
+   ]
+  }
+ },
+ "3": {
+  "class_type": "VC3D_PhotonBreakRules",
+  "inputs": {
+   "danger": 0.5,
+   "order": "climb",
+   "matches": 4,
+   "crumble_off": 2.5,
+   "crumble_on": 1.5,
+   "catches": 10,
+   "dice": 0.7,
+   "game": [
+    "2",
+    0
+   ]
+  }
+ },
+ "4": {
+  "class_type": "VC3D_RemixMutate",
+  "inputs": {
+   "chance": 0.6,
+   "most": 3,
+   "game": [
+    "3",
+    0
+   ]
+  }
+ },
+ "5": {
+  "class_type": "VC3D_BuildGame",
+  "inputs": {
+   "add_seed_to_name": true,
+   "save_to": "LIB_COMFY games (kept apart from LIB_GAMES)",
+   "game": [
+    "4",
+    0
+   ]
+  }
+ },
+ "6": {
+  "class_type": "PreviewImage",
+  "inputs": {
+   "images": [
+    "5",
+    1
+   ]
+  }
+ }
+}
