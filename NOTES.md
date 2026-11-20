@@ -216,3 +216,13 @@ Branch `comfy-remix`. Brief: `Next_Steps_With_Claude/FABLE_JOB_4_COMFY_REMIX.md`
   installed pack (44 nodes).
 - **Not tested:** the actions on the real engine with a person playing (the stand-ins' FX.Sparks draws
   nothing); whether a rule is fun. ComfyUI was still not running.
+
+## The Comfy Games app (19-20 Nov 2026, Opus, branch `comfy-games-app`)
+
+- `Player/` is the app (README there); `genres.tsv` lists the genres; `tools/make_game.py GENRE` makes one
+  game without ComfyUI (the starter chains run through the node classes; no torch/numpy/PIL).
+- Every build now has `-- comfy: genre=<g> seed=<n> built=<iso>` right under the header block
+  (`assemble.comfy_line`; a kit's `GENRE`, a remix game's `"genre"`). A new kit: give it `GENRE` and a line
+  in genres.tsv, and its chain in kit_chains.py.
+- Trap met: on Windows, `shell()` runs `cmd /C <line>`; a line holding more than two quotes loses its first
+  and last quote, so the app wraps such lines in one more pair (CG.MakeCommand, CG.ComfyCommand).
