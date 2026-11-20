@@ -1,4 +1,4 @@
-"""remix: variants of two big hand-made games, Squad Buggy and Vector Toss.
+"""remix: variants of big hand-made games: Squad Buggy, Vector Toss, and Photon Ball (its dangerous mode: photon.py).
 
 The genre kits put a game together from parts. These two are too big to cut up, so Build Game
 reads the original script (LIB_GAMES/Vibecode3D_Games, never changed) and writes a copy with its
@@ -174,7 +174,7 @@ GAMES = {
              "colors": TOSS_COLORS, "derived": ("kCamUp", "kCamBack"),
              "events": TOSS_EVENTS, "actions": TOSS_ACTIONS, "spark": "kBallColor"},
     "photon": {"label": "Photon Ball", "file": "Vibecode3D_Play_PhotonBall.livecodescript",
-               "name": "ComfyPhoton", "genre": "Photon", "prefix": "PB", "knobs": PHOTON_KNOBS, "patches": {},
+               "name": "ComfyPhoton", "genre": "Photon", "word": "Dangerous", "prefix": "PB", "knobs": PHOTON_KNOBS, "patches": {},
                "colors": TOSS_COLORS, "derived": (),
                "events": {}, "actions": {}, "spark": "kBallColor"},
 }
@@ -304,7 +304,7 @@ def source(label, seed, dice, title, name):
     key = which_game(label)
     info = GAMES[key]
     if not title or title == "auto":
-        title = info["label"] + " Remix"
+        title = info["label"] + " " + info.get("word", "Remix")
     if not name or name == "auto":
         name = info["name"]
     g = A.new_game(title, name, seed, dice)

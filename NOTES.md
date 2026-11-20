@@ -226,3 +226,64 @@ Branch `comfy-remix`. Brief: `Next_Steps_With_Claude/FABLE_JOB_4_COMFY_REMIX.md`
   in genres.tsv, and its chain in kit_chains.py.
 - Known Windows trap (handled; not yet seen on this PC, the exe is not rebuilt): `shell()` runs `cmd /C <line>`; a line holding more than two quotes loses its first
   and last quote, so the app wraps such lines in one more pair (CG.MakeCommand, CG.ComfyCommand).
+
+## Photon Ball: dangerous mode (20 Nov 2026, Opus, owner away; branch `comfy-photon-ball` off `comfy-games-app`)
+
+Plan: `LIB_DEV/PriorityTube/PHOTON_BALL_PLAN.md` step 2. The game is step 1's Photon Ball (LIB_GAMES branch
+`photon-ball`, Engine 1, prefix PB.), remixed like Squad Buggy / Vector Toss: `remix.GAMES["photon"]`, plus
+`kits/photon.py` for what is new.
+
+- **Nodes** (category Vibecode3D/Photon Ball), after a Remix Source set to Photon Ball:
+  - **Walls**: density, max_height (hu), ramps, kickers, far_emblems, back_emblems, emblem_width, symmetry, dice.
+    Features only along the three walls that are not the camera side (row 9, columns 2 and 19): ledges
+    (10-20 hu: walk or jump up), taller ledges with a ramp whose high side meets them, pillars (over a jump),
+    kicker slopes rising to the wall. Emblems: `*` on the far wall (pairs mirrored, an odd one across the
+    centre), `P` / `G` on the back walls on the same rows both sides, never behind a ledge taller than a jump.
+  - **Break Rules**: danger, order (climb / shuffle / random / hand-made), matches (list length; the last
+    repeats), crumble_off, crumble_on (seconds), catches, dice. Danger starts the rules higher, climbs faster,
+    shortens the crumble times (never under 0.8 s off / 0.5 s on) and takes catches off a match. Match 1 never
+    punches holes under danger 0.85.
+  - Remix Source alone, dice > 0: both are made with their defaults (dice x 0.5). Dice 0: the hand-made game.
+  - Five knobs are rolled around the original and Mutate may push them: grip at stamina 0 / 100 (WEAK GRIP,
+    IRON GRIP), kMaxFalls (SUDDEN DEATH), kHangEvery (STINGY HANGS), kSmashV (GLASS FLOOR).
+- **The checks** (`photon.validate`, from PhotonBall/README.md's fairness list): 20 x 10 of 40, camera row
+  empty, features only on the ring, home squares (6,6) (15,6) plain, centre columns only kickers, ramps no
+  steeper than 60 hu and their high side meets a wall or a ledge exactly as high, **every plain square of a
+  half reachable from that hero's home** (walking, a step, or a jump of 20 hu: no pockets the ball can die in),
+  the halves within 2 feature squares and 2 pillar squares, emblems only on walls, same back-emblem size both
+  sides. A seed that fails is made again (attempts 2-12), then mirrored (13-24), then the hand-made walls are
+  used (a note says so); an invalid map is never written. About a quarter of seeds need a second try
+  (mostly "halves not fair"); none of 600 + 120 extreme ones fell back to hand-made.
+- **Hooks in the game** (LIB_GAMES photon-ball commit 1b8136d; t63 section N): `kMatchRules`, `kMatchOffMS`,
+  `kMatchOnMS` (per-match lists, the last item repeats, empty = the old constants) and `function
+  PB.WallsText` (empty in the original; a build replaces it with the whole cellmap, a line at a time).
+- **Why the walls are inside the script:** Game.FindFile finds files by fixed `LIB_*` paths. A game in
+  `LIB_COMFY/games`, in the app's `Data/Games/ComfyGames/games/` (installed, read-only) or copied anywhere
+  has no fixed path for a walls file of its own, so it carries them. A copy of the cellmap is written to
+  `games/photon_walls/ComfyPhoton<seed>.cellmap` for the BitEditor only; the game never reads it.
+- **Header:** `## DANGER` (the rule list, crumble ms, catches, danger) and `## WALLS` (what was built) lines
+  in the REMIX block; `-- comfy: genre=Photon seed=<n> built=<iso>` under it (genre written like the others,
+  Squad / Toss; the app compares without case). Title "PHOTON BALL DANGEROUS", or the Mutate words.
+- **Tests:** `python3 -I tests/photon_play_test.py --seeds 1-8 --real`: 9 + 8 + 1 PASS, 0 failed (walls for 300
+  seeds x 2 dice, sliders at their ends, break rules for every order/danger, dice 0 = hand-made, 8 seeds each
+  compile, read their own walls, ground = map at every feature square, each match its rule and crumble times,
+  3000 self-played steps; seed 1 runs and draws in the Game Player on the generated engine).
+  `OXT-BEYOND/tests/t65_photon_dangerous.txt`: 17 PASS (make_game.py like the app, same seed = same game,
+  LIB_BIT CellMap.Read of the copy, ground = CellMap.RiseAt). t63 87 PASS on both engines, t64 45 PASS
+  (Photon is the 10th genre), remix_play_test seeds 1-2 still 0 failed.
+- **What happened playing (20 Nov, real engine, `engine_play.sh ComfyPhoton11/12/13 PB` with the autopilot,
+  copies put in LIB_GAMES for the run and taken out again):** all three ran with no game error at 18 fps in
+  the test standalone. Seeds 11 and 12 played rules 2,3,4,4; seed 13 2,2,3,4: they start where the hand-made
+  game's second match is, so yes, harder from the first throw. Crumble times fell from about 2.1 s / 1.25 s
+  to 1.6 s / 0.95 s by match 4. **But the autopilot heroes never fell** (falls 0/0 in every run, headless too,
+  even in rule 4): the companion AI walks round holes, so "harder" is only proven in the numbers, not in play.
+  No unfair map was seen by the checks; I did not look at the frames (no snapshots taken), so how the walls
+  LOOK (a 90 high pillar in front of the camera corner, ramps reading as ramps) is for the owner's eyes.
+  Most seeds came out mirrored (symmetry 0.6 + dice), and with the default far_emblems 1 most far walls hold
+  only the centre star: turn far_emblems up for more.
+- **Not done (owner away):** `tools/install.sh` was NOT run and ComfyUI was NOT restarted. To see the nodes:
+  run `tools/install.sh` from LIB_COMFY (copies the pack into both Comfy Desktop installs), close and reopen
+  Comfy Desktop, then Comfy Games -> genre Photon -> Open in ComfyUI (or drag `workflows/photon_dangerous.json`
+  in). The nodes were never seen in ComfyUI's window and nobody has played a seed by hand.
+- Ideas next: When nodes for Photon (events: a square breaks, a hero hangs, an emblem struck); an autopilot
+  that risks broken squares, so the soak shows whether danger bites; Comfy Games' exe rebuild to show Photon.
