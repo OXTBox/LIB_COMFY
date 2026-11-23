@@ -283,6 +283,16 @@ on Game.OnStart
    Dodge.StartLevel 1
 end Game.OnStart
 
+-- a level change through the loading screen (LIB_LOADING_SCREEN: burn, green text, the player first,
+-- then the level draws in) when the host has it; else at once, as before. p1-13, 23 Nov 2026
+on Dodge.GoLevel pLevel
+   if "LIB_LOADING" is among the lines of the stacksInUse then
+      Loading.Go pLevel
+   else
+      Dodge.StartLevel pLevel
+   end if
+end Dodge.GoLevel
+
 on Dodge.StartLevel pLevel
    local tM, k, tLaneW
    put pLevel into sLevel
@@ -355,7 +365,7 @@ on Game.OnUpdate
          put 0 into sScore
          put sCfg["lives"] into sLives
          put false into sOver
-         Dodge.StartLevel 1
+         Dodge.GoLevel 1
       end if
       Dodge.ShowHUD
       exit Game.OnUpdate
@@ -381,7 +391,7 @@ on Game.OnUpdate
          put true into sWonAll
          put empty into sHUDWas
       else
-         Dodge.StartLevel sLevel + 1
+         Dodge.GoLevel sLevel + 1
       end if
    end if
    if sMsgT > 0 then subtract 1 from sMsgT

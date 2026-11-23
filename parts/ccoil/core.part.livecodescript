@@ -32,6 +32,16 @@ function Coil.Y pR
    return (pR - (sCfg["rows"] + 1) / 2) * sCfg["cell"]
 end Coil.Y
 
+-- a level change through the loading screen (LIB_LOADING_SCREEN: burn, green text, the player first,
+-- then the level draws in) when the host has it; else at once, as before. p1-13, 23 Nov 2026
+on Coil.GoLevel pLevel
+   if "LIB_LOADING" is among the lines of the stacksInUse then
+      Loading.Go pLevel
+   else
+      Coil.StartLevel pLevel
+   end if
+end Coil.GoLevel
+
 on Coil.StartLevel pLevel
    local tM, tHW, tHH, k, i, tCell
    put pLevel into sLevel
@@ -198,7 +208,7 @@ on Game.OnUpdate
          put 0 into sScore
          put sCfg["lives"] into sLives
          put false into sOver
-         Coil.StartLevel 1
+         Coil.GoLevel 1
       end if
       Coil.ShowHUD
       exit Game.OnUpdate
@@ -375,7 +385,7 @@ on Coil.LevelDone
       put empty into sHUDWas
       exit Coil.LevelDone
    end if
-   Coil.StartLevel sLevel + 1
+   Coil.GoLevel sLevel + 1
 end Coil.LevelDone
 
 -- tests and the demo: the first step of a shortest way to the nearest food (not shrinking food),

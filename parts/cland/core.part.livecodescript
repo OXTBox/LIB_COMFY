@@ -24,6 +24,16 @@ on Game.OnStart
    Lander.StartLevel 1
 end Game.OnStart
 
+-- a level change through the loading screen (LIB_LOADING_SCREEN: burn, green text, the player first,
+-- then the level draws in) when the host has it; else at once, as before. p1-13, 23 Nov 2026
+on Lander.GoLevel pLevel
+   if "LIB_LOADING" is among the lines of the stacksInUse then
+      Loading.Go pLevel
+   else
+      Lander.StartLevel pLevel
+   end if
+end Lander.GoLevel
+
 on Lander.StartLevel pLevel
    local tM
    put pLevel into sLevel
@@ -154,7 +164,7 @@ on Game.OnUpdate
          put 0 into sScore
          put sCfg["lives"] into sLives
          put false into sOver
-         Lander.StartLevel 1
+         Lander.GoLevel 1
       end if
       Lander.ShowHUD
       exit Game.OnUpdate
@@ -277,7 +287,7 @@ on Lander.AfterWait
          put true into sWonAll
          put empty into sHUDWas
       else
-         Lander.StartLevel sLevel + 1
+         Lander.GoLevel sLevel + 1
       end if
       exit Lander.AfterWait
    end if

@@ -24,6 +24,16 @@ on Game.OnStart
    Brick.StartLevel 1
 end Game.OnStart
 
+-- a level change through the loading screen (LIB_LOADING_SCREEN: burn, green text, the player first,
+-- then the level draws in) when the host has it; else at once, as before. p1-13, 23 Nov 2026
+on Brick.GoLevel pLevel
+   if "LIB_LOADING" is among the lines of the stacksInUse then
+      Loading.Go pLevel
+   else
+      Brick.StartLevel pLevel
+   end if
+end Brick.GoLevel
+
 on Brick.StartLevel pLevel
    local tM, tPattern
    put pLevel into sLevel
@@ -167,7 +177,7 @@ on Game.OnUpdate
          put 0 into sScore
          put sCfg["lives"] into sLives
          put false into sOver
-         Brick.StartLevel 1
+         Brick.GoLevel 1
       end if
       Brick.ShowHUD
       exit Game.OnUpdate
@@ -199,7 +209,7 @@ on Game.OnUpdate
          put true into sOver
          put true into sWonAll
       else
-         Brick.StartLevel sLevel + 1
+         Brick.GoLevel sLevel + 1
       end if
    else if tLive = 0 and not sOver then
       Brick.LoseLife
