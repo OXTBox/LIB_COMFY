@@ -27,6 +27,16 @@ on Game.OnStart
    Rocks.StartLevel 1
 end Game.OnStart
 
+-- a level change through the loading screen (LIB_LOADING_SCREEN: burn, green text, the player first,
+-- then the level draws in) when the host has it; else at once, as before. p1-13, 23 Nov 2026
+on Rocks.GoLevel pLevel
+   if "LIB_LOADING" is among the lines of the stacksInUse then
+      Loading.Go pLevel
+   else
+      Rocks.StartLevel pLevel
+   end if
+end Rocks.GoLevel
+
 on Rocks.StartLevel pLevel
    local tM, i, tA, tR
    put pLevel into sLevel
@@ -120,7 +130,7 @@ on Game.OnUpdate
          put sCfg["lives"] into sLives
          put sCfg["extraLife"] into sNextLife
          put false into sOver
-         Rocks.StartLevel 1
+         Rocks.GoLevel 1
       end if
       Rocks.ShowHUD
       exit Game.OnUpdate
@@ -147,7 +157,7 @@ on Game.OnUpdate
    if sSafeT > 0 then subtract 1 from sSafeT
    if Rocks.Count(sRock) = 0 and not sOver then
       add 100 * sLevel to sScore
-      Rocks.StartLevel sLevel + 1
+      Rocks.GoLevel sLevel + 1
    end if
    if sScore >= sNextLife and sCfg["extraLife"] > 0 then
       add 1 to sLives
