@@ -82,6 +82,10 @@ def body(projects, script, cellmap, points, breaks, steps):
               '   set the itemDelimiter to comma',
               '   put ck("match %d: rule %d, crumble %d/%d", tR, "%d,%d,0|%d,%d") & return after tLog'
               % (i, r, off, on, i, r, off, on)]
+        ring = breaks.get("ring") or [1]
+        shows = ring[min(i, len(ring)) - 1] != 0
+        b.append('   put ck("match %d: landing ring %s", value("PB.ShowLand()", tS), "%s") & return after tLog'
+                 % (i, "shown" if shows else "hidden", "true" if shows else "false"))
     b += ['   dispatch "Game.OnStart" to tS', '   dispatch "PB.TestAuto" to tS with true',
           '   dispatch "PB.TestLives" to tS with 99',
           "   repeat with i = 1 to %d" % steps, '      dispatch "Game.OnUpdate" to tS',
@@ -153,10 +157,19 @@ def main(argv):
     for order in ph.ORDERS:
         for d10 in range(0, 11):
             for seed in range(1, 21):
-                b = ph.make_breaks(seed, {"danger": d10 / 10.0, "order": order, "matches": 2 + seed % 7}, 1.0)
+                b = ph.make_breaks(seed, {"danger": d10 / 10.0, "order": order, "matches": 2 + seed % 7,
+                                          "ring": ph.RINGS[seed % len(ph.RINGS)]}, 1.0)
                 if ph.validate_breaks(b):
                     bad.append((order, d10, seed, ph.validate_breaks(b)))
-    report(not bad, "break rules valid for every order, danger 0-1, 20 seeds", str(bad[:3]))
+                if b["ring"][0] == 0 and b["danger"] < 0.85 and b["ring"] != [0]:
+                    bad.append((order, d10, seed, "match 1 without the ring", b["ring"]))
+    report(not bad, "break rules valid for every order, danger 0-1, 20 seeds, every ring kind", str(bad[:3]))
+    rings = {k: [ph.make_breaks(s, {"ring": k, "danger": 0.6, "matches": 5}, 1.0)["ring"] for s in range(1, 21)]
+             for k in ph.RINGS}
+    report(all(r == [1] for r in rings["always"]) and all(r == [0] for r in rings["never"])
+           and any(0 in r for r in rings["fades"]) and any(0 in r for r in rings["random"])
+           and all(r == sorted(r, reverse=True) for r in rings["fades"]),
+           "landing ring: always / never as said, fades only goes, random varies", str(rings)[:300])
     lo = [ph.make_breaks(s, {"danger": 0.0}, 0.0) for s in range(1, 21)]
     hi = [ph.make_breaks(s, {"danger": 1.0}, 0.0) for s in range(1, 21)]
     harder = sum(sum(b["rules"]) for b in hi) > sum(sum(b["rules"]) for b in lo) and \
