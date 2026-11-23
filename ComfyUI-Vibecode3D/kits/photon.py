@@ -39,8 +39,10 @@ RING = set(WEST_STRIP) | set(EAST_STRIP)
 WALL_DEFAULTS = {"density": 0.5, "max_height": 60, "ramps": 0.6, "kickers": 0.5, "far_emblems": 1,
                  "back_emblems": 1, "emblem_width": 2, "symmetry": 0.6}
 BREAK_DEFAULTS = {"danger": 0.5, "order": "climb", "matches": 4, "crumble_off": 2.5, "crumble_on": 1.5,
-                  "catches": 10}
+                  "catches": 10, "ring": "always"}
 ORDERS = ("climb", "shuffle", "random", "hand-made")
+# the landing ring (where a loose ball comes down) per match: a difficulty, no key (owner 22 Nov)
+RINGS = ("always", "fades", "random", "never")
 RULE_WORDS = {1: "THE BALL BREAKS A SQUARE", 2: "EVERY BOUNCE BREAKS", 3: "BOUNCES CRACK AROUND",
               4: "BOUNCES PUNCH HOLES"}
 
@@ -484,7 +486,7 @@ def summary(w):
 
 # ------------------------------------------------------------ the break rules per match
 def make_breaks(seed, given=None, dice=1.0):
-    """{"rules": [..], "off": [ms..], "on": [ms..], "catches": n, "danger": d, "order": o, "notes": []}"""
+    """{"rules": [..], "off": [ms..], "on": [ms..], "ring": [1|0..], "catches": n, "danger": d, "order": o, "notes": []}"""
     s = dict(BREAK_DEFAULTS)
     s.update({k: v for k, v in (given or {}).items() if k in s})
     rnd = random.Random("%s:photon-breaks" % seed)
@@ -492,9 +494,10 @@ def make_breaks(seed, given=None, dice=1.0):
     n = max(2, min(8, int(s["matches"])))
     order = s["order"]
     notes = []
+    ring = make_ring(s.get("ring", "always"), n, danger, rnd, dice)
     if order == "hand-made":
-        return {"rules": [1, 2, 3, 4], "off": [], "on": [], "catches": int(s["catches"]), "danger": danger,
-                "order": order, "notes": notes}
+        return {"rules": [1, 2, 3, 4], "off": [], "on": [], "ring": ring, "catches": int(s["catches"]),
+                "danger": danger, "order": order, "notes": notes}
     if order == "climb":
         # the hand-made climb, started higher and climbing faster the more dangerous
         r = 1 + int(danger * 2.2 + rnd.random() * 0.6 * dice)
@@ -532,8 +535,30 @@ def make_breaks(seed, given=None, dice=1.0):
         off.append(int(round(max(800, min(6000, s["crumble_off"] * 1000 * f)) / 50.0) * 50))
         on.append(int(round(max(500, min(4000, s["crumble_on"] * 1000 * f)) / 50.0) * 50))
     catches = max(4, min(16, int(round(s["catches"] - danger * 4 + rnd.uniform(-1, 1) * dice))))
-    return {"rules": rules, "off": off, "on": on, "catches": catches, "danger": round(danger, 3),
+    return {"rules": rules, "off": off, "on": on, "ring": ring, "catches": catches, "danger": round(danger, 3),
             "order": order, "notes": notes}
+
+
+def make_ring(kind, n, danger, rnd, dice=1.0):
+    """1 = the landing ring shows that match, 0 = it does not; the last item repeats.
+    always / never; fades = shown for the first matches, gone sooner the more dangerous;
+    random = each match rolled, likelier gone later and with more danger. Match 1 keeps the ring
+    unless the danger is near full (0.85, the same fairness line as the hole puncher)."""
+    if kind == "never":
+        return [0]
+    if kind not in ("fades", "random"):
+        return [1]
+    if kind == "fades":
+        keep = max(1, int(round((n - 1) * (1 - danger) + rnd.uniform(-0.5, 0.5) * dice)))
+        ring = [1] * min(keep, n) + [0] * max(0, n - keep)
+    else:
+        ring = []
+        for i in range(n):
+            p = min(0.9, danger * 0.6 + 0.3 * i / max(1, n - 1))
+            ring.append(0 if rnd.random() < p else 1)
+    if danger < 0.85:
+        ring[0] = 1
+    return ring
 
 
 def validate_breaks(b):
@@ -544,15 +569,17 @@ def validate_breaks(b):
         P.append("match 1 punches holes")
     if any(x < 800 for x in b["off"]) or any(x < 500 for x in b["on"]):
         P.append("crumble too quick to step away: %s %s" % (b["off"], b["on"]))
+    if any(x not in (0, 1) for x in b.get("ring", [1])):
+        P.append("ring must be 0 or 1: %s" % b["ring"])
     if not 4 <= b["catches"] <= 16:
         P.append("catches a match %s" % b["catches"])
     return P
 
 
 def breaks_words(b):
-    return "rules %s (the last repeats); falls after stepping off %s ms, after stepping on %s ms; %d catches a match; danger %.2f (%s)" % (
+    return "rules %s (the last repeats); falls after stepping off %s ms, after stepping on %s ms; landing ring %s; %d catches a match; danger %.2f (%s)" % (
         ",".join(map(str, b["rules"])), ",".join(map(str, b["off"])) or "2500", ",".join(map(str, b["on"])) or "1500",
-        b["catches"], b["danger"], b["order"])
+        ",".join(map(str, b.get("ring", [1]))), b["catches"], b["danger"], b["order"])
 
 
 # ------------------------------------------------------------ into the game's script
@@ -589,6 +616,7 @@ def apply(text, g, out_dir, name):
     text = remix.set_constant(text, "kMatchRules", ",".join(map(str, b["rules"])))
     text = remix.set_constant(text, "kMatchOffMS", ",".join(map(str, b["off"])))
     text = remix.set_constant(text, "kMatchOnMS", ",".join(map(str, b["on"])))
+    text = remix.set_constant(text, "kMatchRing", ",".join(map(str, b.get("ring", [1]))))
     return text
 
 

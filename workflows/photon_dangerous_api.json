@@ -36,6 +36,7 @@
    "crumble_off": 2.5,
    "crumble_on": 1.5,
    "catches": 10,
+   "ring": "always",
    "dice": 0.7,
    "game": [
     "2",

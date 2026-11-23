@@ -650,7 +650,7 @@ _node("VC3D_PhotonWalls", "Walls (Photon Ball dangerous)", CAT_PHOTON,
 _node("VC3D_PhotonBreakRules", "Break Rules (Photon Ball dangerous)", CAT_PHOTON,
       "Which floor rule each match plays (1 the ball breaks a square, 2 every bounce breaks, 3 bounces crack "
       "around, 4 bounces punch holes) and how fast broken squares fall. danger 0 = gentle, 1 = it starts bad "
-      "and gets worse fast. The last match's rule repeats.",
+      "and gets worse fast. The last match's rule repeats. The landing ring can come and go by match too.",
       [("danger", _float(0.5, 0.0, 1.0, 0.05, "0 gentle .. 1 brutal: rules start higher, squares fall sooner, shorter matches")),
        ("order", _pick(photon.ORDERS, "climb", "climb = worse each match; shuffle = 1-4 in any order; "
                        "random = each match rolled; hand-made = 1,2,3,4 as the game has it")),
@@ -658,6 +658,9 @@ _node("VC3D_PhotonBreakRules", "Break Rules (Photon Ball dangerous)", CAT_PHOTON
        ("crumble_off", _float(2.5, 0.8, 6.0, 0.1, "seconds a broken square holds after you step off (danger shortens)")),
        ("crumble_on", _float(1.5, 0.5, 4.0, 0.1, "seconds it holds after you step on it, rule 2 on")),
        ("catches", _int(10, 4, 16, 1, "catches a match (danger takes some off)")),
+       ("ring", _pick(photon.RINGS, "always", "the landing ring (where a loose ball comes down): always = every "
+                      "match; fades = the first matches only, gone sooner the more dangerous; random = each match "
+                      "rolled; never = no ring at all")),
        ("dice", _float(0.5, 0.0, 1.0, 0.05, "how far the seed may move these settings"))],
       lambda game, dice, **k: _photon_set(game, "breaks", dice, **k))
 
