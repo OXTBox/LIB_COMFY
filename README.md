@@ -73,6 +73,11 @@ down, sniper down, flag held, jump...; catch, drop, floor broke, hero falls...) 
 (sparks, score, say, a bomber comes, crater ahead, bounce...; extra hang, mend the floor, crack a
 tile). `random` lets the seed pick. Dice 0, no Mutate, no When = the original game.
 
+Squad Buggy's **Terrain** node has a **wreck** knob (23 Nov 2026): how much a bomb wrecks the land, 0 = no
+craters, 1 = as made, 2 = craters twice as big (never deeper than 70, and cut so a jump still crosses one).
+It sets the game's `kWreck`; Mutate words SOLID GROUND / WRECKED LAND. Needs LIB_GAMES branch `squadbuggy-view`
+(the game's `constant kWreck`): merge that first, or every Squad Buggy remix build stops.
+
 ## Adding a kind of part
 
 1. Write `parts/<kit>/<part>.part.livecodescript` (handlers use the kit's prefix).

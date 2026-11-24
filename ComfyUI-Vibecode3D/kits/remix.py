@@ -44,6 +44,9 @@ SQUAD_KNOBS = [
     K("kSeg", "terrain", "segment", 20, 30, True, "ground segment length (20 smooth, 30 angular)"),
     K("kCraterR", "terrain", "crater_width", 30, 90, True, "crater half width", None, "WIDE CRATERS"),
     K("kCraterD", "terrain", "crater_depth", 18, 60, True, "crater depth", None, "DEEP CRATERS"),
+    K("kWreck", "terrain", "wreck", 0.0, 2.0, False,
+      "how much a bomb wrecks the land: 0 no craters, 1 as made, 2 craters twice the size", "SOLID GROUND",
+      "WRECKED LAND"),
     K("kFlagGap", "terrain", "flag_gap", 1500, 3600, True, "distance between flags", "SHORT RUNS", "LONG RUNS"),
     K("kTowerGap", "terrain", "tower_gap", 700, 1800, True, "distance between buildings", "TOWER CITY", None),
     K("kHoldSteps", "enemies", "hold_steps", 300, 900, True, "steps to hold a flag (30 a second)", None, "LONG HOLDS"),
@@ -182,7 +185,7 @@ LABELS = tuple(v["label"] for v in GAMES.values())
 FREE_DICE = 0.5      # the dice of a knob no node has set
 # the originals' numbers on 18 Nov 2026: slider defaults only when the game files can't be read
 # when ComfyUI starts (a build always reads the file)
-FALLBACK = {"squad": {"kGrav": 0.18, "kJumpV": 6.2, "kShotV": 22, "kSeg": 20, "kCraterR": 52, "kCraterD": 38,
+FALLBACK = {"squad": {"kGrav": 0.18, "kJumpV": 6.2, "kShotV": 22, "kSeg": 20, "kCraterR": 52, "kCraterD": 38, "kWreck": 1,
                       "kFlagGap": 2400, "kTowerGap": 1100, "kHoldSteps": 600, "kSnipeRange": 620, "kRoundV": 4.2},
             "toss": {"kTile": 40, "kHalfW": 360, "kHalfD": 160, "kTop": 300, "kBallR": 8, "kGrav": 0.16,
                      "kBounce": 0.62, "kFloorDrag": 0.86, "kRollDrag": 0.95, "kRunSpeed": 5.2, "kJumpV": 4.6,
@@ -507,6 +510,10 @@ def fix_squad(g, v, d):
     if air * 3 < v["kCraterR"] * 1.3:
         v["kCraterR"] = int(air * 3 / 1.3)
         g["notes"].append("craters narrowed to %d: a jump can cross one" % v["kCraterR"])
+    # kWreck makes every crater wider (and deeper, still no deeper than 70): the wrecked one too
+    if air * 3 < v["kCraterR"] * v["kWreck"] * 1.3:
+        v["kWreck"] = round(air * 3 / (1.3 * v["kCraterR"]), 3)
+        g["notes"].append("wreck cut to %.2f: a jump can cross a crater" % v["kWreck"])
     # a round must not outrun a shot by much, or snipers can't be answered
     if v["kRoundV"] > v["kShotV"] * 0.4:
         v["kRoundV"] = round(v["kShotV"] * 0.4, 3)
@@ -691,7 +698,7 @@ def still_squad(g, d, v, col, W, H):
     bottom: the course of one level (3 flags) with its towers"""
     def hill(x):
         return 70 + 45 * math.sin(x / 420.0) + 22 * math.sin(x / 170.0 + 1) + 10 * math.sin(x / 61.0)
-    cx, R, D = 430.0, v["kCraterR"], v["kCraterD"]
+    cx, R, D = 430.0, v["kCraterR"] * v["kWreck"], min(70.0, v["kCraterD"] * v["kWreck"])
 
     def ground(x):
         t = abs(x - cx)

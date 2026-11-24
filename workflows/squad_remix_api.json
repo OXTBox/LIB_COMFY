@@ -28,6 +28,7 @@
    "segment": 20,
    "crater_width": 52,
    "crater_depth": 38,
+   "wreck": 1.0,
    "flag_gap": 2400,
    "tower_gap": 1100,
    "dice": 0.7,
