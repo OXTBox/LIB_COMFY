@@ -18,7 +18,9 @@ for certain games then those choices should move with the ComfyGames."
   Win, Lose), Lander (Win on landing, Lose), Dodge (Pickup/Powerup, Win, Lose), Rocks/Waves (Win, Lose, UFO Explode).
 - Tests: `LIB_AUDIO/tests/t83_comfy_words.txt` NEW (34 pass); `OXT-BEYOND/tests/t64` +3 checks (CG.Play goes
   through AUDIO, Worm words have Pickup); t79-t81 green; `tests/kit_play_test.py` 0 failed.
-- **Still open:** step 4 (the 37 old games stay silent / rebuild: his call); step 5 (public download:
+- **Step 4 decided (owner, 24 Nov):** "We leave the old comfy games as they are, as long as the eventual
+  public items have all the bells and whistles." So the 37 old games stay silent; the public download must carry the sounds.
+- **Still open:** step 5 (public download:
   vibeinstall's ENGINE_FILES needs lib_audio.livecodescript in Player/Engine, AUDIO builds itself in memory
   without AUDIO.livecode; plus the Sounds kit). The Player stack `ComfyGames.livecode` still has the old
   script (his uncommitted changes in it, left alone): re-save it with the new script before the .exe build.
