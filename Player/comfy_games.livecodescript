@@ -1255,7 +1255,11 @@ command CG.Audio pName, pFile
    if tLib is empty then exit CG.Audio
    try
       if not ("lib_audio" is among the lines of the stacksInUse) then start using stack tLib
-      if not Audio.IsOpen() then Audio.Open
+      if not Audio.IsOpen() then
+         Audio.Open
+         -- installed: the kit beside the program goes into the player's Sounds folder once
+         if there is a folder (CG.Root() & "/Player/Sounds") then Audio.Seed CG.Root() & "/Player/Sounds", CG.Root() & "/Player/Music"
+      end if
       Audio.Refresh CG.GameFolders()   -- new builds since the last game get their cards
       Audio.Select pName, pFile
    catch tErr
