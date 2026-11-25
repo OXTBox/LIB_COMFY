@@ -4,6 +4,27 @@ To do **together with the Comfy Games rebuild** (Priority Tube n-c58324eb, `PLAN
 The owner's words (24 Nov): "ComfyGames can remain without sounds for now. When sounds are specifically set
 for certain games then those choices should move with the ComfyGames."
 
+## DONE 24 Nov (later): steps 1-3, branch `comfy-audio` in LIB_AUDIO and LIB_COMFY (waits for his look)
+- **Lookup rule** (`Audio.WordsFile`, `Audio.Family`, `Audio.RemixSource` in lib_audio): own
+  `Games/<Game>.txt`, else the family's (`ComfyPhoton.txt`), else the remix source's (`PhotonBall.txt`).
+  Borrowed words get the script's other names added from the kit. **Save** in the AUDIO window asks
+  "This game / Whole family / Cancel" when the game has a family (`Audio.UISave "family"` skips the question).
+  `Audio.Refresh` takes folders one a line.
+- **CG.Play opens AUDIO** (`CG.Audio`, before the window, as GL.Open): Refresh with `CG.GameFolders()`, then
+  Select; `bNoAudio` turns it off; no LIB_AUDIO = the old sound-kit way. `CG.EngineFile` finds
+  `lib_audio.livecodescript` (Player/Engine, else projects/LIB_AUDIO/livecode). So `...` > Sounds... works in Comfy.
+- **Parts use kit names:** boom/shot -> Explode, PlayerCrash, Hurt, PlayerLaser; new: Pong (Hit, Bounce,
+  Pickup, Hurt, Win, Lose), Bricks (Bounce, Hit, Thud, Blip, Powerup, Hurt, Win, Lose), Worm/coil (Pickup,
+  Win, Lose), Lander (Win on landing, Lose), Dodge (Pickup/Powerup, Win, Lose), Rocks/Waves (Win, Lose, UFO Explode).
+- Tests: `LIB_AUDIO/tests/t83_comfy_words.txt` NEW (34 pass); `OXT-BEYOND/tests/t64` +3 checks (CG.Play goes
+  through AUDIO, Worm words have Pickup); t79-t81 green; `tests/kit_play_test.py` 0 failed.
+- **Step 4 decided (owner, 24 Nov):** "We leave the old comfy games as they are, as long as the eventual
+  public items have all the bells and whistles." So the 37 old games stay silent; the public download must carry the sounds.
+- **Still open:** step 5 (public download:
+  vibeinstall's ENGINE_FILES needs lib_audio.livecodescript in Player/Engine, AUDIO builds itself in memory
+  without AUDIO.livecode; plus the Sounds kit). The Player stack `ComfyGames.livecode` still has the old
+  script (his uncommitted changes in it, left alone): re-save it with the new script before the .exe build.
+
 ## Where sound stands (24 Nov)
 - LIB_AUDIO (hidden AUDIO stack) steps 1-5 on main: the Game Player opens AUDIO (`GL.Audio` in
   LIB_DEV/livecode/game_launch), the engine's `Sound.Play "<Name>"` goes to `Audio.Play`, the AUDIO window

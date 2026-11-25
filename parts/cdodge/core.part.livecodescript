@@ -127,6 +127,7 @@ on Game.OnUpdate
    if sTick mod 10 = 0 then add sLevel to sScore
    if sDist >= sCfg["distance"] and not sOver then
       add 100 * sLevel to sScore
+      Sound.Play "Win"
       if sLevel >= sCfg["levels"] then
          put true into sOver
          put true into sWonAll
@@ -262,6 +263,11 @@ end Dodge.Drop
 on Dodge.Take pK
    FX.Sparks sMe["x"], sCfg["cy"] + sMe["y"], kZ, 8, sPick[pK]["color"]
    add sPick[pK]["points"] to sScore
+   if sPick[pK]["kind"] is "life" then
+      Sound.Play "Powerup"
+   else
+      Sound.Play "Pickup"
+   end if
    switch sPick[pK]["kind"]
       case "shield"
          put 300 into sShieldT
@@ -280,11 +286,12 @@ on Dodge.Take pK
 end Dodge.Take
 
 on Dodge.Hurt
-   Sound.Play "boom"
+   Sound.Play "Hurt"
    subtract 1 from sLives
    put empty into sHUDWas
    if sLives <= 0 then
       put true into sOver
+      Sound.Play "Lose"
       put false into sWonAll
       exit Dodge.Hurt
    end if

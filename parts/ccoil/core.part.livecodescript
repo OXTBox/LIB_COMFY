@@ -317,6 +317,7 @@ on Coil.Eat pSeq
    put empty into sOcc[tAt]
    FX.Sparks Coil.X(item 1 of tAt), sCfg["cy"] + Coil.Y(item 2 of tAt), kZ, 8, sFood[k]["color"]
    add sFood[k]["points"] * sLevel to sScore
+   Sound.Play "Pickup"
    add 1 to sEaten
    switch sFood[k]["kind"]
       case "shrink"
@@ -365,10 +366,11 @@ end Coil.FoodClock
 
 on Coil.Die
    FX.Sparks Coil.X(item 1 of line 1 of sBody), sCfg["cy"] + Coil.Y(item 2 of line 1 of sBody), kZ, 25, sCfg["wormColor"]
-   Sound.Play "boom"
+   Sound.Play "PlayerCrash"
    subtract 1 from sLives
    if sLives <= 0 then
       put true into sOver
+      Sound.Play "Lose"
       put false into sWonAll
       put empty into sHUDWas
       exit Coil.Die
@@ -378,6 +380,7 @@ on Coil.Die
 end Coil.Die
 
 on Coil.LevelDone
+   Sound.Play "Win"
    add 50 * sLevel to sScore
    if sLevel >= sCfg["levels"] then
       put true into sOver

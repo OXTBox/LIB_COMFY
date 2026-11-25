@@ -205,6 +205,7 @@ on Game.OnUpdate
    Brick.MoveDrops
    if sLeft = 0 and not sOver then
       add sCfg["levelBonus"] * sLevel to sScore
+      Sound.Play "Win"
       if sLevel >= sCfg["levels"] then
          put true into sOver
          put true into sWonAll
@@ -297,14 +298,17 @@ on Brick.MoveBall pB
    if sBall[pB]["x"] < -sCfg["hw"] + tR then
       put -sCfg["hw"] + tR into sBall[pB]["x"]
       put abs(sBall[pB]["dx"]) into sBall[pB]["dx"]
+      Sound.Play "Bounce"
    end if
    if sBall[pB]["x"] > sCfg["hw"] - tR then
       put sCfg["hw"] - tR into sBall[pB]["x"]
       put -abs(sBall[pB]["dx"]) into sBall[pB]["dx"]
+      Sound.Play "Bounce"
    end if
    if sBall[pB]["y"] < -sCfg["hh"] + tR then
       put -sCfg["hh"] + tR into sBall[pB]["y"]
       put abs(sBall[pB]["dy"]) into sBall[pB]["dy"]
+      Sound.Play "Bounce"
    end if
    -- the bat: only a ball coming down, landing on its top; where it lands sets the angle
    if sBall[pB]["dy"] > 0 and sBall[pB]["y"] + tR >= sBat["y"] - 6 and sBall[pB]["py"] + tR <= sBat["y"] - 6 + 1 then
@@ -316,6 +320,7 @@ on Brick.MoveBall pB
          put -tSp * cos(tA) into sBall[pB]["dy"]
          put sBat["y"] - 6 - tR into sBall[pB]["y"]
          FX.Sparks sBall[pB]["x"], sCfg["cy"] + sBall[pB]["y"] + tR, kZ, 4, sCfg["batColor"]
+         Sound.Play "Hit"
       end if
    end if
    Brick.HitBricks pB, tR
@@ -366,11 +371,13 @@ on Brick.HitOne pR, pC
    if sCell[pR][pC]["hp"] > 0 then
       Entity.SetMesh sCell[pR][pC]["key"], "Brick.Plain"
       FX.Sparks tX, tY, kZ, 3, sRow[pR]
+      Sound.Play "Thud"
       add sCfg["points"] to sScore
       exit Brick.HitOne
    end if
    Entity.Kill sCell[pR][pC]["key"]
    FX.Sparks tX, tY, kZ, 10, sRow[pR]
+   Sound.Play "Blip"
    add sCfg["points"] * sLevel to sScore
    subtract 1 from sLeft
    Brick.MaybeDrop tX, tY
@@ -412,6 +419,7 @@ end Brick.MoveDrops
 
 on Brick.TakePower pKind
    local i, tFrom, tA
+   Sound.Play "Powerup"
    switch pKind
       case "wide"
          put 600 into sWideT
@@ -458,8 +466,10 @@ on Brick.LoseLife
    if sLives <= 0 then
       put true into sOver
       put false into sWonAll
+      Sound.Play "Lose"
       exit Brick.LoseLife
    end if
+   Sound.Play "Hurt"
    put 0 into sBallN
    put empty into sBall
    if sWideT > 0 then

@@ -212,7 +212,7 @@ on Rocks.MoveShip pTurn, pThrust, pFire
       put sCfg["shotLife"] into sShot[sShotSeq]["life"]
       put Entity.Spawn("Rocks.Shot", sShot[sShotSeq]["x"], sCfg["cy"] + sShot[sShotSeq]["y"], kZ, sCfg["shotColor"]) into sShot[sShotSeq]["key"]
       put sCfg["cool"] into sCool
-      Sound.Play "shot"
+      Sound.Play "PlayerLaser"
    end if
 end Rocks.MoveShip
 
@@ -277,7 +277,7 @@ on Rocks.Break pR
    Entity.Kill sRock[pR]["key"]
    delete variable sRock[pR]
    FX.Sparks tX, sCfg["cy"] + tY, kZ, 6 + tSize * 4, sCfg["rockColor"]
-   Sound.Play "boom"
+   Sound.Play "Explode"
    add sCfg["points"] * (4 - tSize) to sScore
    if tSize > 1 then
       Rocks.AddRock tSize - 1, tX, tY
@@ -356,6 +356,7 @@ end Rocks.Saucer
 
 on Rocks.UfoDown
    FX.Sparks sUfo["x"], sCfg["cy"] + sUfo["y"], kZ, 20, sCfg["ufoColor"]
+   Sound.Play "Explode"
    Entity.Kill sUfo["key"]
    put empty into sUfo
 end Rocks.UfoDown
@@ -363,12 +364,13 @@ end Rocks.UfoDown
 on Rocks.ShipDown
    Rocks.Flame false
    FX.Sparks sMe["x"], sCfg["cy"] + sMe["y"], kZ, 30, sCfg["shipColor"]
-   Sound.Play "boom"
+   Sound.Play "PlayerCrash"
    Entity.Kill sMe["key"]
    subtract 1 from sLives
    put empty into sHUDWas
    if sLives <= 0 then
       put true into sOver
+      Sound.Play "Lose"
       exit Rocks.ShipDown
    end if
    put 70 into sDeadT

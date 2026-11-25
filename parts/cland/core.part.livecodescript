@@ -265,6 +265,7 @@ on Lander.Landed pPad
    add tGot to sScore
    FX.Sparks sMe["x"], sCfg["cy"] + sPad[pPad]["y"], kZ, 12, sCfg["padColor"]
    put true into sLanded
+   Sound.Play "Win"
    put 90 into sWaitT
    Lander.Say "LANDED. PAD X" & sPad[pPad]["times"] & ": +" & tGot, 90
 end Lander.Landed
@@ -272,7 +273,7 @@ end Lander.Landed
 on Lander.Crash
    Lander.Flame false
    FX.Sparks sMe["x"], sCfg["cy"] + sMe["y"], kZ, 30, sCfg["craftColor"]
-   Sound.Play "boom"
+   Sound.Play "PlayerCrash"
    Entity.Kill sMe["key"]
    subtract 1 from sLives
    put false into sLanded
@@ -293,6 +294,7 @@ on Lander.AfterWait
    end if
    if sLives <= 0 then
       put true into sOver
+      Sound.Play "Lose"
       put false into sWonAll
       put empty into sHUDWas
       exit Lander.AfterWait

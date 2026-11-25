@@ -187,6 +187,7 @@ on Game.OnUpdate
    Wave.MoveBombs
    if sAlive = 0 and not sOver then
       add sCfg["waveBonus"] * sLevel to sScore
+      Sound.Play "Win"
       if sCfg["levels"] > 0 and sLevel >= sCfg["levels"] then
          put true into sOver
          put true into sWonAll
@@ -221,7 +222,7 @@ on Wave.MoveShip pKeys
       put sShip["y"] - sCfg["shipSize"] / 2 into sShot[sShotSeq]["y"]
       put Entity.Spawn("Wave.Shot", sShip["x"], sCfg["cy"] + sShot[sShotSeq]["y"], kZ, sCfg["shotColor"]) into sShot[sShotSeq]["key"]
       put sCfg["coolSteps"] into sCool
-      Sound.Play "shot"
+      Sound.Play "PlayerLaser"
    end if
 end Wave.MoveShip
 
@@ -298,7 +299,7 @@ on Wave.KillFoe pN
    put false into sFoe[pN]["live"]
    Entity.Kill sFoe[pN]["key"]
    FX.Sparks sFoe[pN]["x"], sCfg["cy"] + sFoe[pN]["y"], kZ, 12, sCfg["shotColor"]
-   Sound.Play "boom"
+   Sound.Play "Explode"
    subtract 1 from sAlive
    if sFoe[pN]["mode"] is "dive" then
       add sWave[sNow["wave"]]["points"] * 3 to sScore
@@ -421,11 +422,12 @@ end Wave.ShieldAt
 
 on Wave.HitShip
    FX.Sparks sShip["x"], sCfg["cy"] + sShip["y"], kZ, 30, sCfg["shipColor"]
-   Sound.Play "boom"
+   Sound.Play "PlayerCrash"
    subtract 1 from sLives
    Entity.Kill sShip["key"]
    if sLives <= 0 then
       put true into sOver
+      Sound.Play "Lose"
       put false into sWonAll
       put empty into sHUDWas
       exit Wave.HitShip
