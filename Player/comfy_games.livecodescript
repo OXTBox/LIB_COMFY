@@ -432,6 +432,9 @@ function CG.EngineFile pName
       case "lib_data.livecodescript"
          put tProjects & "/LIB_DATA/livecode/" & pName into tPath
          break
+      case "lib_audio.livecodescript"
+         put tProjects & "/LIB_AUDIO/livecode/" & pName into tPath
+         break
       default
          return empty
    end switch
@@ -1188,6 +1191,7 @@ function CG.Play pFile, pQuitOnClose
    if tName begins with "Vibecode3D_Play_" then delete char 1 to 16 of tName
    set the itemDelimiter to "."
    put item 1 of tName into tName
+   CG.Audio tName, pFile
    put "Play" && tName into tStack
    if there is a stack tStack then close stack tStack
    lock messages
@@ -1238,6 +1242,26 @@ function CG.Play pFile, pQuitOnClose
    send "Player.Start" to stack tStack in 50 milliseconds
    return empty
 end CG.Play
+
+-- the hidden AUDIO stack (LIB_AUDIO), as LIB_DEV's GL.Audio: the game's sounds fill one per
+-- tick, the engine's Sound.Play goes through it, and ... > Sounds... chooses them. A Comfy game
+-- uses its own words, else its family's (ComfyPhoton.txt), else its remix source's (PhotonBall.txt).
+-- No LIB_AUDIO (Player/Engine or the projects folder): the engine's own sound kit, as before.
+command CG.Audio pName, pFile
+   global bNoAudio
+   local tLib, tErr
+   if bNoAudio is true then exit CG.Audio
+   put CG.EngineFile("lib_audio.livecodescript") into tLib
+   if tLib is empty then exit CG.Audio
+   try
+      if not ("lib_audio" is among the lines of the stacksInUse) then start using stack tLib
+      if not Audio.IsOpen() then Audio.Open
+      Audio.Refresh CG.GameFolders()   -- new builds since the last game get their cards
+      Audio.Select pName, pFile
+   catch tErr
+      CG.Log "AUDIO did not start:" && line 1 of tErr
+   end try
+end CG.Audio
 
 function CG.WindowRect
    local tL, tT
